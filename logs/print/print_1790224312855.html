@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นางสมพร  แสงชัย</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14953</span>
+                    <span>HN: 000138304</span>
+                </div>
+                <div class="header-name">นางสมพร  แสงชัย</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD4-69-013060</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAACxklEQVR4AeyZi26rQAxEOf3/f743ljtZE7wPRIsKS9XVODO2N36USM3Xv8l+vpbJfuYuGFjg+OktDZQ79vhCiYN9tu6Ze8Lqwp2xOuHXw3vZe3qNAl/DmFcx4BogaoUxZtReJfh+US34W78ddAsGmg+yXkegxPd8R3UoOWFrt/J0C24FX1F7Cv7NqelhA/vW8Cff0zPhn+zmX8x16oTBV1mrHfGs5pxa8FlFte7pFhynkNmt5DUNfNJQMOauxYmPvpktvwSXbsFZ0JW5p2BND8q6wZit2Bpq/aIuDsodUZcNRYcxW7ER556wun0UY0czO+aXnnGmRf6IbbnszD1h68Ddz2rCUB4GKhwKB2O2Yg3jGoLHG68DW06aIbgO42hxtbMquOZ0J/4peHSaWtXon3FQVlG+0Oag6FlOcTVs3fNM+LM7el3D2GXwyUTfqLfsWgxsc8oXXIM1Ss/wmXDWlTtxuyYcV1JNgLJO0qFw8jOEwsPaNj07yhlRfpGLtvQMdxWcJbgWt6z/ARC7lNnA5luI6AeuZxzw/q4qNkm+kRu1we+DNbbi555wqzN30XZNWOsXMTZCfOQyW36Gmd7jwFfY4rMDW105dxWsoCvj3AWDrwIcw7gBceUiLxv8rlE/yJ/24HkApV59ooice8LqgmHs+KhtcZ8HeHdaGhROuaXVUH6G4PE13xb/TLjVnTto3QmDrw/keLQJ4HljHnAOiPTGBt5/LrbqOnLUa0Nx3YLleBc8tWDwiVjHPw+4BuVjx3zA+V7Dwf2gxGcxpxacvYGzuafgMzoOZf1699la24F2jPnoVHO+hGfCrybc+rc7Ya1JDXvdqcWJ78VnehYL25WHLdctOLvwyly1YCjdgTE7awSUWOmw5aSNIHi8Jm2YxRmvI71asBzuhnMXrPEfxbgVMZf4UU7+hjFGtvE64gzFZTjdhP8DAAD//6NwtHwAAAAGSURBVAMAVKpexenUbcgAAAAASUVORK5CYII=" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">AMLODIPINE 5 MG<span class="med-bin"> (iL8 2-1)</span><span class="med-timecode">t2+1</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">ATORVAS 40 MG TAB<span class="med-bin"> (iL8 2-8)</span><span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">(R)Gemigliptin Tab.(Zemiglo)<span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 2</div>
+                                <div class="drug-hn">HN 000138304 &nbsp; AN 69-14953 &nbsp; -</div>
+                                <div class="drug-patient">นางสมพร  แสงชัย</div>
+                                <div class="drug-name">
+                                     (R)Gemigliptin Tab.(Zemiglo) &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1</span>
+                                </div>
+                                <div class="drug-inst">08:00 หลังอาหารเช้า</div>
+                                <div class="drug-location">LED (No location)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAFZklEQVR4AdyYUXLbSAxE/XL/O3v5AAEDkiPHWf8kTKmFRqMxYo+UTdX++nzwn18fD/7T4YAP+B7qPmD51eDcT03+O8Dah8VrD5YGX3N3OpzN03ALd/wV/HiHXfjyOpvcfgLoFhZv8SC1bz3aeE2uYP8V9BRu4RwAt5+o+hV+SGmwdtQh+5pPbXLncPaq6RGA7Q3Ab59xG+520j8q/CgccIrtTQtF68TU5BPlA+LbcAaL2/8f/CicDwXrISA5sH0WIB4e2M49T8B+vl36QvxRuC/O/StG23De3hXvnnb6yqMG9LcEyedcjyjtXX3nUb/iesYtHOSDwL1el4GWgP4nBBYvgw9S3ApE+Cu3F/oFYNsAYg/2tY0HuYU7tMe8Opy39F3M9JA36G7pV24P1DhuXk3A/Vtu44Xo/y5c7XA2T0OHA+JGDQjJAdsAEHNY1VuM4fEGHO/5gsVTOb+7B8R58prC0iB5zayA5QRYGhBnAuHpcNG93vxA8Wq7qE304CDqQBx+tFEhe0CpAeunCLTXMwTQXvtq5ED4p1b8WrfhrqZ/te9w3oq4BoG8KWeQvDxA0dNttngQ98RB+/X5+Rl+WPsOgdDlBaDobdaDQfwsodThgNtymTTC+inZizm3n3AmSpMX4H5W+aqW1x7y2dTsBaQ2+Zyrdzibp+EWDuiMcL5hYPvt1o1ZRR9wEMgdWHV6Jj/sX75gPY97Ani70+E0iqsT6EDOBSxt+iF1PVOXqxUApbfQB8TnyicgdcjqITWXT3S4KT6Fb8NB3oo3MoNC6lMrrrcA6YP1MyqfVZ9VAJaAurCxCvmEmihtciC+bSDG23AxecDbb8N5M8KsViEXkDckF0Dc3PSoC8ASgMX1FoDYD9PrDXixj9Ns7ny8/qi9aJQOB5yWY3q8QeouQvJD7hfcNYf6BeT8HdcL6ZEXIDX3SrNC6pD1OrcXejuczdPQ4UwrDGgVk8P9Pw7l0TcBeavAlLcc1rmeJzRahRyIX5V9Qb0AOa++aocrwWVIM1By/C8EID6kRKBoVHffIQybN/1AnAtZpw2Y7R/xW7g/2v7LzR0OiNvzeb1NIZ9Qu2LOYZ0Bi5endoGSTnXOgdvzQGpA78H6WQOxA8S8w82DY3K8qR0lXsBpMcTjTY+A84eoCci9w9r76gX1ye3FTnunQ35G7Vj1djibp6HDwUoPyQ0Li3sjQv0r6IG1pxewbAH0twqEBwhtniWP4XhTKwBj8vHR4U7qQ5oOl+k/T7GA7p0DcZstviGw/v65J7RaBWAbgMVDON70FGCdBcs758fK9tXhagrrMLU6ZHIgQgLKDSB0dyA5ZG3Ti0Dqel9S/Fs6+9JheSE5ZNUDyd2F5Oq3cIpPQYeDTGz6CieH1GHVmlshdXkBKNrfhme1OAgsb8lA/AKAkqLCuVf03AKcf3UdrgwuTJS+q1fftXcHuD2oenknh/TWrKqeK2p2rbDO6HBX0xP6DgeZGH5f3wWftwt5zs4LtAznn5KDeY59Adbe1ID4dajVrrzD2Yga7qrzK8p31b/bu19euaj+Wr+aXb32t3CKT8E2HOTXDKvuAnuTsDywuLMrIOe7s6YG6QNCBuJnB6vG4PVWn2ML6ZFvwzl4An4UDtjegTe5HQxRj4B1BhDfkDZnBXthbxVyIZ9QE2o/CucBHiQmB2xPgKWVX4Mc6FBq3wHkztyXz90fh5uH/W18G84buGL34HpKn1wN8mblwnnBHs5ztZpb4T6H9W+iHgG4usUtHBA/EbjX6wmwPHPmhxYgPXM+OTDb4LA0WNwzw/DmDZZXyy2c4lPQ4byV76LCT39p11qed3rNreWR71DzWa++OfsPAAD//28qIUsAAAAGSURBVAMAqLjo3gI8cxsAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

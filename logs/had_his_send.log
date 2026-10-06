@@ -1,0 +1,17 @@
+[2026-07-11T12:34:14.484Z] PRESC_NO: WARD29-69-05164 | USER: 1 | HAD_ITEMS: 5 | STATUS: ERROR | MSG: HIS service request timed out after 8000ms | XML_FILE: E:\web_Interface\Interface_api\logs\xml\HIS_HAD_WARD29-69-05164_2026-07-11T12-34-06-467Z.xml
+[2026-07-11T12:50:03.954Z] PRESC_NO: WARD29-69-05164 | USER: 1 | HAD_ITEMS: 5 | STATUS: SUCCESS | SOAP_RESULT: &lt;ROOT&gt;
+&lt;RETVAL&gt;0&lt;/RETVAL&gt;
+&lt;RETMSG&gt;发药机窗口号与HIS系统不一致&lt;/RETMSG&gt;
+&lt;RETCODE&gt;0&lt;/RETCODE&gt;
+&lt;/ROOT&gt; | XML_FILE: E:\web_Interface\Interface_api\logs\xml\HIS_HAD_WARD29-69-05164_2026-07-11T12-49-58-755Z.xml
+[2026-07-11T13:07:33.484Z] PRESC_NO: WARD29-69-05164 | USER: 1 | HAD_ITEMS: 5 | STATUS: SUCCESS | SOAP_RESULT: &lt;ROOT&gt;
+&lt;RETVAL&gt;1&lt;/RETVAL&gt;
+&lt;RETMSG&gt;01&lt;/RETMSG&gt;
+&lt;RETCODE&gt;1&lt;/RETCODE&gt;
+&lt;/ROOT&gt; | XML_FILE: E:\web_Interface\Interface_api\logs\xml\HIS_HAD_WARD29-69-05164_2026-07-11T13-07-31-932Z.xml
+[2026-07-15T07:16:57.011Z] PRESC_NO: WARD3-68-007761 | USER: 1 | HAD_ITEMS: 2 | STATUS: ERROR | MSG: HIS service request timed out after 15000ms | XML_FILE: E:\web_Interface\Interface_api\logs\xml\HIS_HAD_WARD3-68-007761_2026-07-15T07-16-41-969Z.xml
+[2026-07-16T05:42:19.714Z] PRESC_NO: WARD3-68-011553 | USER: 1 | HAD_ITEMS: 2 | STATUS: SUCCESS | SOAP_RESULT: &lt;ROOT&gt;
+&lt;RETVAL&gt;1&lt;/RETVAL&gt;
+&lt;RETMSG&gt;01&lt;/RETMSG&gt;
+&lt;RETCODE&gt;1&lt;/RETCODE&gt;
+&lt;/ROOT&gt; | XML_FILE: E:\web_Interface\Interface_api\logs\xml\HIS_HAD_WARD3-68-011553_2026-07-16T05-42-13-388Z.xml

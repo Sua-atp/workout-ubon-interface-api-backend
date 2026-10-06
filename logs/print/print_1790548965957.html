@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายวีรยุทธ  กล้าลอด</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-15161</span>
+                    <span>HN: 000127629</span>
+                </div>
+                <div class="header-name">นายวีรยุทธ  กล้าลอด</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD32-69-01161</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAC1klEQVR4AeyYi3bjMAhEc/v//7xbwk4gK2TZSZOeSM4pHQwMMo+Th7/+LPb6uiz2Wrtg4ALPy2hpIM5QLLQ280HY4XHdcpmsPWHrwOzSnfD3m/flqFTNgljDyr/XdvReLL7K3S24Cp7BNiwYYkLQ6o80wbovAc+pa8NRTnAO1LjFHxa8Rf5E31nwO6YGsYq2wibvONfOOCdsXZhZXj5hW1cJ+CpXDQX3AZX7x2wvL/jH7vSHEg0L1nR6eOQ+lCNzgOsPFvkMs7/SLWZLKs4/22VYsAJnwbNgTRJ81WA/ipsRgp/t0rWasB0H4Yd9us7IuPaE1e1nMXc06+CTyTbp+UzZDLP9Gd1ymaw9YevA7HI3YfCVAx6qG7h+po7IeTWh5YDbILDKCeGHVq84dwVXAbPZ1i44r5omC+2qQNgUZyi+6RLZMsqXESLn3tgcV+k5v/S1J6wu9HDURfAp9fjQ+pWzx5EfnAvcHh9D2CB05YLWdk5Y3ZkV7yYMsQLg+pHCq/Ub8WHfOcptCM4xvZKtM+8K3gqcw3e5fwCQu6UCsw24fpOCQMUZgttNl4DbIN5s5OshBKeK0T1lHwQHXFecoWLXnrC6MDN2J2xrYJKLt+v/5YgffNUqTmWzs2QH50KgfIYWK7HrnnQL7hE+3b52wRDrAo/reQu0ZoayQ5vb/BLFHUGInOJBa1t7wuqMobp9BI23JVu5Mg/ayWT/Xj2fJ845YXViVhxOGGK9oNWPNAacnznQ2qpVzJxK38sZFlwl/2TbrxesyYBPGmrMTRYn2yB4lV+xv16wbuRdeBb8yk5Xqwa+iqNzxTVULDgX4re2+SHs4PqV8/3vnPB3E6b+G07YVmRLnu2Ocuc8smUEX00gh9504Pb4SbybMynDglPsFGq3YIiOwT696ghsc0ecLX/2aaqGspsuka1bsAJmw7UL1vifxbwVo1yK7cWN/OIpboTLTfgvAAAA//+PP42zAAAABklEQVQDAOjqVcUtHsjhAAAAAElFTkSuQmCC" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">RISPERIDONE 2 MG TAB.<span class="med-bin"> (iL5 3-7)</span><span class="med-timecode">t2+2</span></div>
+                        <span class="med-qty">#4</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRAZODONE 50 MG TAB<span class="med-bin"> (iL4 1-8)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL *5* MG TAB<span class="med-bin"> (iL8 1-2)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN B1 100 MG TAB<span class="med-bin"> (iL4 2-3)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">LORAZEPAM *1* MG<span class="med-bin"> (iL6 3-2)</span><span class="med-timecode">t1ins</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">28 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 000127629 &nbsp; AN 69-15161 &nbsp; -</div>
+                                <div class="drug-patient">นายวีรยุทธ  กล้าลอด</div>
+                                <div class="drug-name">
+                                    LORAZEPAM *1* MG &nbsp; <span class="drug-qty">#1</span>
+                                    
+                                </div>
+                                <div class="drug-inst">1t.prn insom, กิน 1 เม็ดเวลานอนไม่หลับ,</div>
+                                <div class="drug-location">LED iL6 3-2</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEhElEQVR4AeSagXIbNwxE/fL//9zqHbIkjseT7XE6UykZrxZYLKlbyHbTmfz6543//Pp44z8jHPAB34N7gf0ZZyugvNGheiDSeIYhPApg6PC1+nHsY4SzeTdcwj1+BD8+w7Ml5CzMDa9+qNmq26/n1YLMnnG88iWc4rvgNhzUdmHyLvS6RSh/90Jpq9c+PigPFDsTmXeG8sDkPk99Gy6GV+Yfh4O5PWD8vGYpbj+IBnUmvRxPGK4efd/Bj8PlYfKmUA/VdSgNijMDcmz8qh/CHyh+HO4PPMN/dsVtuGy381eeIv7uXTXg+KT0ZBaGmqXXsyKzzqvH/jacw1fHJRzU5uCee2goX7YI1ccDpBwc7xAeBXB8mplB9Y/R+ILS4J6H+VFcwj20t/ka4bKx7/BuCznfZ1Cb7pq1XllYC+sV6t+Fd4xwcH4AqB7QdwA4vnVgct4UpgYcfl+cyx3Acc8zzXNCD1z90WUB5YFitRHO5t0wwrklkYDWAcxtOI9uDeeZmoDSYf6tZZzT8ABMz6M9vmBqwKHlBTg+cSj2vsx2PMLthq+uXcJBbeVZMJget9eRczsN5jl9euRnAMZYf8cYPIquWz+kv/T/xE1+BzcjnAPHz4G1UBdQOkx2LpwL68BepA93DequzHYM03P5ttwdeFVthIOZuIeB6287mF43K6A0KFYT3iV3QHn6zFp0nzXcvz/UPTDZO4IRLsLKeQOYF6gFUPp6DqYOs9bXz9rvAPMMVA3FOd85d0Sz/zScplfFl8L1bRgUaoOA7YHVk74zcPzygeLj4PIC97PctRw52t3sS+GO0y/4cgkHn28uW+oMdS4aVO9OoOrM1AKoGRTHE45PhvLAlZ2vuIRbDa/cj3DZVBhqOz0clAaT+7zX/Z7Umfe+186h7rYO4lk5884wz49wMcAcqkH1cP3vjW+mR1gL6w41qDu6bu1MFtbC+ifwDuEdl3CK74IRDmq7phY9oL2IBuUFIo1f8RGAQ7P3rLD+DPpEfNYw71KH2TsXUBoU6xvhbN4NI5zpxVcC6hN6oTZlL9SEtQBst4A5A8YnrRlm7z1CvaNr1qLPR7gS3+v1Eg5qY25B7OJCeXaznQb3fjjPYN9D6cDpLYDTJ+4zC02XcIrvgks4U4sE7HXX1EW0O+4eqC1DsWecd6h19FnqzIGUWx7hgOPjha9zvxHqXNfWen04ezifUxP9LJw9mekLoDxQrGeEs3k3XMJlE894t4T41xnMv7Zldud1DnPz9uLODzg+oXsv4U7OF29uwwGXn8Fd1r4p53A+51xdwHkGn3+qcD3jXaLfbS3Ug9twMbwy/zgc1GbvlgDcjY5/1pEhcHynpA/7aQSrZg/7c85+HM5LBOzfxAdzvgMwZH1iCL8LmJ7f0rEE4GDPiHVm/8fCedn/Dbfh3MaK3cOvnvTxQm0YiHRi4PgE4MzdBDVb77aPD8qTXr4N5/DVcQkHtQG45x4a9j63GsSffsfxrNy9UO8VrXujhZ1dwim+C0a4JP4Ou4Q7v7MgnvQ7jmfl7s2sa8/qfwEAAP//l5xIfgAAAAZJREFUAwDpS4LeCQQC5wAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

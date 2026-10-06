@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายสิทธิชัย  บรรพตาที</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14932</span>
+                    <span>HN: 001749009</span>
+                </div>
+                <div class="header-name">นายสิทธิชัย  บรรพตาที</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD29-69-09166</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAACzUlEQVR4AeyYi27rMAxDe/b//3zvFIE1Uztxs7ToZmeYRpWUlOqBYujXv8l+vm6T/czdMHCD8+ZHA3U913s+1PlwnNNz5t6wpjAybm74+8P7dtR6g1I9j4M8T+davnKPYKvOZsOt4BG4bsOQG4A2nh2CNgalfq8mlFio/b38bsN7yX9Ruxp+9dZ0soGwfX6hy179HrzetWGfxoj+2zcM5Yx1so5QdEj/nYN+e8PvfPM/qd1t2LfR8nsP9RyoN+i6/CM1leO4k3/rNryX/Be1q2FtDfL84HlUriOUfJ0dFE6xUHPSAqHo8JwfeY8294a1gbPoU/VakJtxXb7HiQt0/owftcLm3nBMYHRbbRjy5IBm38CpL/lU1E8Tsqa0QEgOiJeVAcv7cAGSgzYqdtWwyJHxaljbhfo0pAX6WT76oR81KM/zepB8r57ntHzlz71hn4wm4pz7kJOHGj1OdY4glJrKg8KpvrRAKHq83rK5N7w1lZH41YZh/yxgX9epQTtOug9wj5P2iMqH8hyPaeniVg2LHBdv6y8AfErygeW/GmA1B+mOwBLrnCdB6lDjVpzzj74/B+qarit37g1rCiNjd8N+Fu63hiK9pTmnOEfX3Yf6VCE5j/Na8iHjgHtot+F75CDO3A0Dy6csnMMjxwD5LJ1hoOfH67AeB1kH8NDKn3vDPo6Y6lHz/Javeq61ONdbPrBcYksLDlJX7cDgw64NxxRGtu6GIc8D2viO4cQJyiCf+5PnQOYC9/Ruw/fIQZyPNAwsHzrQx705Q8nXRWyh6nykYT38E3g1/Oqp+4lBnqBzzz7Pc+R7LmRtaOMS+/3n2vD3EIb+7W5Y57OFZ6ejul5HXKB4KKcqzjFiZeL1OlBct2EFjoKbDUOZKDznt4YCJTcmHQaF6+W09DPcZsNniv7m3LkbjnN7hfmGvZ74Hud6y9+rE5pywn+06Tb8HwAA//9GhhKGAAAABklEQVQDAL6Ti8WH4yPRAAAAAElFTkSuQmCC" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">IBUPROFEN 400 MG<span class="med-bin"> (iL6 1-8)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CEfazolin 1 GM INJ.<span class="med-bin"> (iL1 5-3)</span><span class="med-timecode">1 g v q 6 hr</span></div>
+                        <span class="med-qty">#4</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">PARACETAMOL TAB. 500 MG<span class="med-bin"> (iL8 5-1)</span><span class="med-timecode">tt1</span></div>
+                        <span class="med-qty">#10</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; Ward สามัญรวม &nbsp; เตียง H140</div>
+                                <div class="drug-hn">HN 001749009 &nbsp; AN 69-14932 &nbsp; -</div>
+                                <div class="drug-patient">นายสิทธิชัย  บรรพตาที</div>
+                                <div class="drug-name">
+                                    CEfazolin 1 GM INJ. &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">1 g v q 6 hr</span>
+                                </div>
+                                <div class="drug-inst">iv 1g q 6hr<br>18:00</div>
+                                <div class="drug-location">LED</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEaUlEQVR4AdyZgY7bSAxD9/X///lun7Ucy+Nxmlx6QOMCXEkkZ2IqmxRFf/1z4z+/vm78Z4QDvuA1uBd4fEZPAOWdZyDUeIZBfDfA4OG5/vvY1wjncDecwn1/BL9+h3eXALX91T15bTh7oj2q/c5TuC5+en8ZDmpzsNdV2Gxx1sLDfj5caj8Duw8Yvz3dkx6OXiDSoV6GO7g+dHg7HLB9k+XdSO37WHHq8lZh3wF1r9p/xdvh8kB5ADg/FBQHVbu390DGP1LfDvdHnuJ/uuQyXN6RXh89A7D9es6e1XnYvV23h12b78qsb0a0Xi/DddOn9qdwUJuD69rDQvmyya7ZA5YDVl5ge+dXWg5DeeC6xms9hZO8C0a4bOyV2pcAtc3O2XsfrDX1QJ+A8toLdeur8NwIB3WppICaAccNwParA3vNi26G9gN2T6O3FkpzgOqhqtwMWGvAsAKHZ1MY4RzuhqfCQW0l4fu7Bdfa7B/nInzXFfdNj3fBPoB6LajqWdh758AzT4XT+IkY4ZIYjpswVLRUKE/X7AWUFq9VXkBp9kINjpx8BzBG/R1DuGhGuAv9o+kRDth+z5MGjrM8FPfK9qDOAF6xIee34efHilOStwrg8IxyM2D3jHCz6Q7zCOeGrjAHhdoO7DVn44XSnKOlwlnTJ+JJhf1f5Z2D/Q7PwXGWG+GgRKiqOCOX9xoP1Llo4Z2htHCpUDwQalRg/ApC9VDVO2fkYHjnEc7hbhjhkjg1QYG02yaBURXiT4XSM3cPlCYXdJ8cHD3q8sJe2M+QF50f4Tp5l36Eg+PGekAozc106IHS7EV0+wDKM2vOUBpUlevwjsxQHjhXfTNGuFm4w3wKB8etuLU5KOyeaFBc5lTYv8rDeacAQo0KbJ/pEEDapyowzo9wvljHo5u6b+5hv9w71OHIyQs166vwnFidkxdqI5zD3TDCwXq7PTCUB/YaHYpbzW5SROtVfoV41KDuthdQsx5nAcVBVbURzuFuGOFML+aAcP2FoBf2TTnPAGZqzLBrwPgi0AD77HMJ+Y7O2Yuuj3BF3uvnKRzUxtxCMEeG3TNrqxnK/4wGRy/UDHvt90Dx4fozn8LFdId6CteTzwGjpXY9XGrX0kNtGarKx58q1xG+1+hA2mUd4YDtAw3P1+WNP+TqYcL9WLb/GoZ6vc7py2yFo0dO6AugPFBVfYRzuBtO4bKJR/XREmDfnD54/FeJng44nlfLs9h3AH3c+u49hdscN/lxGQ44fQZXmfumug51fsVBafD7dxV2L1SfO33t3vdZ/jKc4qfj7XBw3OZqIbD29E3DtUefyN32whnW59TeDuclHb5oR9fmHhhUzgzip4Hd80ONj4vzfA7YdLU/Hs5L/xZchstGel09dPRosG9OLnqv8gGUH441uud63+fwVqjz9sFluBg+uZ7CQW0ArmsPDEdf1+zhqMP+9e+7EOi9AhzvWJ0Jl+pdp3CSd8EIl8SvVJdw5VcTK11+xsonp8/aIfcM/gUAAP//dezdQAAAAAZJREFUAwCWv3nef91RVwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; Ward สามัญรวม &nbsp; เตียง H140</div>
+                                <div class="drug-hn">HN 001749009 &nbsp; AN 69-14932 &nbsp; -</div>
+                                <div class="drug-patient">นายสิทธิชัย  บรรพตาที</div>
+                                <div class="drug-name">
+                                    CEfazolin 1 GM INJ. &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">1 g v q 6 hr</span>
+                                </div>
+                                <div class="drug-inst">iv 1g q 6hr<br>12:00</div>
+                                <div class="drug-location">LED</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEpUlEQVR4Adya23LcRgxEdfz//5zsGbhnwCEpS1FSlaVrmwAajSEbe7Ef/OuvB//59fHgP9Mc8AHfg3uBmjEXUDWsKC+gOHMBVQOWA8B4jlH8vkBx8PXo6DRn8TSczL2+gh9/wtUSoLZ61ds5uNfm3nDWpPdZ7Pc6mevNd89vzUFtDla8MrtvMZrOQ53ROfNojVAaqGhf2NsBpYEVd431rTmb744fm4O1PWB+X/tifAdE58w7Z94Bda66f4ofm+sPZL4/CNRDworRAEnHzz+sejZ+kPzY3A/u/Z+P3przXdjx2dMAY/tXmpyTHixteomwetHvMdoed431rTmb746TOajNwX3spqF02SJU3TV7Hm3noeauetFBaeA+Rms8mZN8Cqa5bOw7sS8BapuZh6rVwMqtr7DPpVab/DvRuWkOjg8AVQPqBoDxowEr7jccwnax38qRQs1bQOVQUW4HXPeAKQUOz2ZjmrN4Gk7moDbQjUJxvgsdXZMcSpva2GfMPyR/w1r8LmeA8zlQHFR0DlZuHXjQyZzkUzDNdcfdnHxqqC1BRXmoHCrK3QGOGs+GI7fPApNS3zEbN8k0d9N/a/rWXDYE61/64b4S+1aA8UsWLvOpjVdceKOA4zlyO2Bpbs3tQ+9Yn8ztG7SG2gacY0zDsdd5z+iA0qoJby5SJ8L5kwM1DzgyABw+HZInc5J3yA0T1UEdGi7RXgClSZ0IxQOhZgTmw0LlUDH36DGD4ay/Zc6Bd8I0B7WV/eGBSQFjm1DRRt+UNayedfpGOPZ631zAUeOcvDAX5jvkReenuU4+JT+Zg+Pmroy6IWEPSg8V5YU9AcXD+mGQF+pg9WFp7AlA6QBw+OTAqodgu5zMbf23Lqc5tyR2N1cc1MZ6z1xczcuL9MwFEGpGYLw7k3glasUr/eML1vw0lykPEamN1sJcmAvzHbAOTw/OnL27M+x9BufElUZe2DuZk3wKpjk4bhdWDZW7EQFVw/oBgOKyGHXC2ijMd8hfITp7UGebC6hajbWA4qCivWnO4mmY5nQvYtBcAKHGFx3WuzUbr0SteKWHF6z5Q+NVwOoB4/wXPV6was8Vo9EunTMXrf0xzRX5rOvJHKyNxaob6YDSyEHlUDEzUHXXpNcjlC4cXNdQPBDpiMDhHfd+wubJnORTcDKnaxGDPe/cFW9fvkMugNoyVJTvWnO5Drkd6QNJL+M0B4y3F74e+4l5gM6ZA4aBXWMNjPsOwesiJ17pfMFRk4a6AEoDFdVMcxZPw8lcNvFZ/MoSoDbYz8lcuNQ9Qs117k4PdNnIu/Zkbigecrk1B4zvAqx45TmbgqWD9Rc9MMeA05mZj2iv4TzTtT13NrXx1pzNd8ePzUFt1q2JLASKT30Vv6JXE+SMXsP9fX5sLjdMzI0Twxt3DpAe2HuDfF1gaV7leAHj422xz8Hq/evmvOH/BbfmspEerx46/b0HtUH7UDlU7FooDo4xGud73uvwRqh58+DWXATvHE/moDYA97EbhtKFg6rdsADSmv8vTH7HFF0kwPiOQcXMdmm4RHsnc5JPwTQXx9+JLiF6c3FXy9u/g/0rqN95ua/gbwAAAP//hidjOQAAAAZJREFUAwABmYXe24McqQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; Ward สามัญรวม &nbsp; เตียง H140</div>
+                                <div class="drug-hn">HN 001749009 &nbsp; AN 69-14932 &nbsp; -</div>
+                                <div class="drug-patient">นายสิทธิชัย  บรรพตาที</div>
+                                <div class="drug-name">
+                                    CEfazolin 1 GM INJ. &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">1 g v q 6 hr</span>
+                                </div>
+                                <div class="drug-inst">iv 1g q 6hr<br>06:00</div>
+                                <div class="drug-location">LED</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEjElEQVR4AdyYC3LcOBBD5+X+d96dpzZIiiL9ySSVGqUCdzcAUkKP7dTur/9u/OfX48Z/WjjgAT+De4E6Y/8V4OyFmoF2FDjeoxHPBoqD79fnsUcL53A3XMI9fwQfX+E7S4C+5dkPpc28c54NV0+0z6p3BJdwEe5Qt+GgNge9rgJni1C+eMI7Q2nhUtUCKA9UXXl2XiDSqW7DnVxvOrwcDrj8dnMX0PndpyCvV9iPgH5e/Xfwcri8UB4O55dSh+Kg6ugdeyDjH6kvh/sjb/GXLtmGc+MzfucdgPZPS84D7Vt5fgZ0Lf65zmecZ4/zNpziu+MSDmpzsK9jaCif2xPR7EXmscqLkYP1PSsPlBeudfRfwo3iu/ctnJv8KcbwUFvMHStt5OY+5+B6T7SfVO9v4aAulRRQM+B4ADh+EUCveeBheH6BrkH9MnnSp79QHkmoHqrKzYC1BjQrcHo3hRbO4W7YhssnYoXaiv2IcRnhRy59tNRHhGddcU+6fQr2AdR7QFXPQu+dA89swym+O1q4JIbaBPS60+TnBciJ8EDay6ehDzj4ZpoaoDH6RzRh07RwG/2t6W24bMh0wLHdcKlQPKDtAHB4j+HjC5y5nP+Qj7LiFOStAs73yM2A7tmGmw+949zCQU88B3F7IjyUVy6IlvmzCnXeM/HZi8ypUP9WZrZCnQc8cgC4fMe0cB4Sh/P5Bco8ck/6+CsnHKB8UFVuBqw1KB6YjxwvCsUDbYZr2LyLl9gL+xbO4W74MhyctwbnOQtxWwJKD2+VF7DX9Ak4ezwnL+yF/Qx5MfJfhhvN79Zvw7kFYSDrCmoz4gsP9UlA/1mJphe6Dt2jJuK1wtkLfVafsQ03G99xbuGgtuC2BPQZqodzXQWG8oya94lw9gII1Spw/GYMAf3TDPdZhX6+hfNhYj4IzFT7Hz76A+B4qdUMpc0X6Z2578yeEyuvvFBr4RzuhhYOzts1vTCwdQR0L1QfXf8I+PzbKufmmjvk4fwMqFmPuoDioKpaC+dwN7RwphergNC3oa5PzL1zoC4yryrQaOD4mQ0BffYeES115OxFNGsL5/B43OvrJRz0jSWqGxGZoXug9+pQM1T1HFSvPgPOGqxnKB44XQGcPnGfJzRdwkneBZdwphYJOPYjt+KjjxVoI3BsGaoqeM8IuRGjlj46kHZZWzjg9GD4el7dmBdIHT0z5wz1nPjkRGYrnD1yQl8A5YGq6i2cw91wCZdNfFZ/soTxnpwLl3ms0DcffucHYml19F7CNdcNmm044PIzuMqbTUH544HzLA/FQa85ry7mGboXqtcn9FqFvbAPtuFieOf6cjiobbo1kWXYCyDUpaqHBI7vlMypeoKZc4b1ObWXw3nJCrB/aPxA2vbfiI34aKB7PqhjCVD8HBw4dL1/LZyX/2tsw2UjY129bHToG9MX3h5KGzl5AaXBuaoJz1iFvbCfAXV+5LfhRtO79pdwUBuAfR3DQvlGzh6uPBTn9md4Zgeoc1A1Z0d/uFS1SzjJu6CFS+KfVJcw++XEzI+z+oxRH3t942wv9x38DwAA///K9RumAAAABklEQVQDAFy5fN4f19fCAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; Ward สามัญรวม &nbsp; เตียง H140</div>
+                                <div class="drug-hn">HN 001749009 &nbsp; AN 69-14932 &nbsp; -</div>
+                                <div class="drug-patient">นายสิทธิชัย  บรรพตาที</div>
+                                <div class="drug-name">
+                                    PARACETAMOL TAB. 500 MG &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">tt1</span>
+                                </div>
+                                <div class="drug-inst">1tab. prn, กินครั้งละ 1 เม็ด, ทุก4-6ชม.เวลามีอาการปวดหรือมีไข้<br>22:00</div>
+                                <div class="drug-location">LED</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAETElEQVR4AdyXC3IbMQxD/Xr/O7fBMqC4EuVP3cnU2xmEJABpDcZOk1+/L/zv1+3C/zIccIPXUPcC/dnqcQ/h1QyjrzMMHqKH56vuynAaroYl3NdH8PYIdQkQ2zTns54hdMBU3g+DS/G7me8Rbe5elc9Ywlm4Qt2GA5bPYBfYW7QGcc58rRCavV21H/ZeCA1G7e7ahuvMn8b9s3DeeLcAiA3PHs+qEB6I2t3zKvd2OIgXA1H1QgWIGcjXBBxv9SRKozMVRfrr9u1wf/3kHzi4DVe36L57PdZc73k6Dc7fTTjP3Rk/q9bOtw3XmT+NW8JBbA72tYaE8JmDmL1V810FTv+hw5h3foj7oa/13BKuip/eZzhv+pWq8PZDbLKb5RNmTZxhzXOt1l6pOp/hIF6cSAHGDKOfNc0/DTi/Hj0fVi7DyXA1ZDh/yyE24FmBaz/PEH7xFfUMTJ5ihNAgapGyhbPmuyF46H8QZbi86ULNw3AwtgNr7y26ejcwvNYgOHtUrakX4OyB8V2B0CCqzupMBYQm7mE4mT4VGQ4isbYhONDca66wD+I8RDUvL5w5a7XKJ1Ru7qVXVB3iGdalZTgNV8MSDmIDMKpDw+AA00etGzuI8mXW5rlY89cxc/ICpz+VIGYYn0f5BJ9TzXASKiQK4lQrxAniIB6kXhAvqBcAlacBHEF0h1APwqpBcNXnPsOZuFLdhtPWBGDJCxzbBbaazgoyAIdfswAxSzMgOOlC5d2LFyC85nd1G2534JP4JRzEViCqNmU4mOdarXXVvlkTb069APFc812Vz+h0c0s4C1eoGQ72G4PQvC2I+ZkF6MzsEyfM/KszcPdIhtPDOsB6gX0wNOD4oeGnQcwwaqeZ21U9a6dVHsZzgEPKcMd0sS8ZDmg33+WF4YXRy6tNC+oF9QacvdINCG32wvgtZPZ6VvU5V3EZTsPVkOGcGM4bNK/q8Op3gPN5iBnw8bsVON5Bvv+uuYgQ5yCqpAyn4Xa71tcMB5HYG4OYgUwMHFuFfbUZwuP7VK2pFzTD6pMGwVcPDE68IG8HaRlOw9WQ4ZzeAT2rdpx4YdbmGTCVFTjeAUl8NbByX3T+fadnGeIFzdCfk57hIEzwfNUFeoAAcU69IE1QD71mXR71O0Cc73SdFWD1ZLju4KdzSzht4RHuhYZ1g77v3jl74PnzQF7ZnV/CpfsCzTYccHzoYdQuL4RuzRv0DLjNao9qkt+NOOF7XF4DjPvkA04en1PdhpP46Xg7nLZX0S0EYrudZg7CA1F9p/Ta1xnWX6qr9+1wEC8GourhjwDhBR5ZH+rA8bZ0KIhZB98Op0v+V2zDeRO1diGsW4PYHES1rgrB2Vur9AoIr7jqm3vpAoS/6ttw1fSp/RIOYgOwrzUshK9yu14brpAPzufhPMtj+CyER/OseVZdwom8CjKctvAqtIRHZ+TZoZ61p3LqzdcqXqice/GC5j8AAAD//0iDfvgAAAAGSURBVAMAHeVq3kVBipkAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

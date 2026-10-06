@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายชัยพงค์  กมุทชาติ</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14959</span>
+                    <span>HN: 000039304</span>
+                </div>
+                <div class="header-name">นายชัยพงค์  กมุทชาติ</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD32-69-01087</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAACxklEQVR4AeyYi27rMAxDe/b//3xvPIEx0zhWumArameoQUYSZeiBbOvXv8l+vh6T/cxdMPCA6ydbGujf4Xrox8I5v3LOPWF1YWQ8nPDy8n68erJGQayf58008rvmLJfW8bBgDxqJpwVDTAXamDUDqk6xsLfJdwah6mHPeznSgnviT/TdBf/m1Hovm9+813PfE/ZujMjfMmGob9a/bupbCv7rIv2+tODei6b4PNlZXnQ6ENPWc8EsT4npnY7+kRbcE3+i7y5YU4NYNTiP0mYINadWE6qtpYfqh3O8lWfuCavbV7HV2WKDmEzhz8fvdJ/br3DlnHvC6sLIuJkwxMoBa83Ay1/sreKFtNZwMa8fiPyr4YlA+OE8PqXYPG4K3ngGfZi7YF8/iBV6ZdDSQ2ihjYorqPxQY2UrWGLKKVynPPeO4mCfc+4JqzOO3km3i7sfoqNuU5wjRBywfhXs/rMcah6ovKe/J9zrzgi+zYRhvxawt5XCtbZQ/S1biX0+iisIoX+O6T1DaIq+dXraTcG9wDF8j/wLAO+gFw18/wXWsh1pFAuhhfylBRHbygnhgy3qnhbeE251ZSTbZsK+NuJerGwZusa5dG7LeE8j3zNCrLjbdc+mYBlHxrkLhlgFuIa+Ib5WEHndD2HzOPeLQ8QBMm0Q+P6tAax2YGebe8JraxbiHT/LF9nuA7XLyuNBLZv7xRXnKN8reE/4lW59Ymw6YagrCXt+tWiInEd5IPywR9e0Vr1lSwv2pCPwtxTsnReHOkFvrPwt9DioesW6X/wtBevyd+Bd8F90Her6/eQ+CL1rtcYF3b7hy8M94aUJQ3/SCZcV6Z2sO66F/Sq29BBxQMu9fpcNrP8cQOUSwd6WFizxKHhYMNTuwDneagpUbcuf2aDqYctd65ske8t2WLBEo+HcBfsKXOG+FVkexWZxmV95Mpxuwv8BAAD//+vo/cwAAAAGSURBVAMAK3BqxeG8nhMAAAAASUVORK5CYII=" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">RISPERIDONE 2 MG TAB.<span class="med-bin"> (iL5 3-7)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN B1 100 MG TAB<span class="med-bin"> (iL4 2-3)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN C 100 MG<span class="med-bin"> (iL8 6-2)</span><span class="med-timecode">t3+4</span></div>
+                        <span class="med-qty">#12</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">DIAZEPAM INJ. 10 MG/2 ML<span class="med-bin"> (iL2 3-3)</span><span class="med-timecode">IV</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">HALOPERIDOL 5 MG./ML.INJ.<span class="med-bin"> (iL2 2-5)</span><span class="med-timecode">IM</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRAZODONE 50 MG TAB<span class="med-bin"> (iL4 1-8)</span><span class="med-timecode">t1ins</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN B1 100 MG/ML<span class="med-bin"> (iL2 4-4)</span><span class="med-timecode">100 mg iv @12.00</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000039304 &nbsp; AN 69-14959 &nbsp; -</div>
+                                <div class="drug-patient">นายชัยพงค์  กมุทชาติ</div>
+                                <div class="drug-name">
+                                    DIAZEPAM INJ. 10 MG/2 ML &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">IV</span>
+                                </div>
+                                <div class="drug-inst">23:00 IV, นำยาไปให้แพทย์ฉีด, ................................</div>
+                                <div class="drug-location">LED (iL2 3-3)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEYklEQVR4AeyYjXLjRgyD8937v3N7nxisKK3WP5O2U2sucwhIELs2aDvJ3K+/bvz16+vGXyMc8AXvwb1AnbEWcN0DjjcA02Ntg/YNyqMEVcPr7LkRzuZumML9/gh+PUNfQrxdW9VQm+/znIeaQXH3pI73EccrT+EU74JlOKgNws6PQkP5zp6rLcfjLHVYrSN6Z6jHgp37PPUyXAyfzD8OB7W9bDvLgNKBSBPD4xms59NlF8KPw13cuUnnsIrA9ivA+oz4Ye05n3nW/2vhnj3wfzFfhssmO7/yhOKP177X5z4zOL5i+kTmndXP6PPUy3AxfDJP4aA2CGt+FBjqXDxAyu3zBow/EmCfxZRXBNj80WUoDdasL5jCZXAHHuGysXf4agE532dQm84M9j6+8yy6nNk77LkRDuoBFc+A4wyqB87W0QPb28onNMTvQk0A38qagO0euObzSSif+ghnczdM4aCSw85uWUBp1sJlyMJawOxRF1CzL5sToGbe1XGyTS3UuWnwW5jC/dZu82+Ey7aSLL0cLQy1LWdQdWZqIr1s36EWwPE8HPt+7qpe3aM+wtncDSMcHDeWoEDKwdkgzLOYgPFT7kqD/Zd57usM+3moOveEYb8jWucRrot3qUe4bO2VYFCbzBkZSoPifg8cNf2ie1LDtbf7oTxdsxa5Rx7hoA4oCjj2ah7uUAu6bh1dtu+Auht21ncFWHuAcQTYPgZ5HAcjnM3d8DScm4DaSsLDsVeH0qDYcwGUBsXRPRfAevaOJ175aThNn4opXLYaBkY2YHpfw1HLuXGoFZlBnXEULawmep867DyAuiszqN75FE7xLpjCwZ58FRJmD5QGxTkLpBycLSsA27vB+hng6PWeR2emcB4QsF9kL3KRtUgv2wvrjq7Bfmc8zgXUDI6sD0qzFlA9/PkL5Wv8p42bEW4zgNqUuoBjrxZcnYkWjleG413xXLF+kZl1AHVPn01vy5jvwC+F69swdHqY3/NQG9R3BtQMinOPfPamh/ICkQZ7Dlj+QDqFG+duUYxwUBuA4qQDUg4Gtm25uYhQWnpnwh6ez/QKKC8Ue/4M2Gee6YB9NsKdL7hDP8L19NYJd67tAz1Qm+qaegD75/LsgX0W/9mTvnO8nWF+HiMc1BBe56vLo0HdYw9VQ7FaALOWWRjWHqhZwueMPMLZ3A1TuGzgEfclrHzxOO+1PRy3rRbPFTsX786mcFcXfKq2DAe1Xdj5KiTsc9jrK280XwUBRBoMbL9mIkD1sPMrMz3LcA4/HT8O5yvwCLD/uId9+1A6lLZa5KO7+5n4uvbjcP0ya5ifLJSWJxAGPPIygMNbNvfIUDMo9tJ/PJyX/l+wDOc2znj0pKE2ljPxppejwdHbZ/GEgZQvsXcJzctwDj8dUzhge1/DmntoKF/XrKF0wHYDsN3tZoUilGYt1IW1ONf2UGcALRvUxdZ8f5vCfeu3oBHO1O/CDZzPqImu24to1sGV5myl95ke+xX+BgAA//8ho09zAAAABklEQVQDAF4zed4kC3VaAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000039304 &nbsp; AN 69-14959 &nbsp; -</div>
+                                <div class="drug-patient">นายชัยพงค์  กมุทชาติ</div>
+                                <div class="drug-name">
+                                    DIAZEPAM INJ. 10 MG/2 ML &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">IV</span>
+                                </div>
+                                <div class="drug-inst">23:00 IV, นำยาไปให้แพทย์ฉีด, ................................</div>
+                                <div class="drug-location">LED (iL2 3-3)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEhUlEQVR4AdyWi3IiSwxDOfv//5yL2iOP+zWQYuvWMqkI2bK6QSYk+fNz468/jxt/ZTjgAb+D9gJxRvUO8NoznoXzDEQN77Puy3Bq7oYp3PMj+HiFugR7IbZaZ67tcQ/hBSxNPJ6RwdoVy2dM4Ty4A2/DAdNncBUYwudtXnkgvPbojGszhAeCrVeGmMHJde56G86Gb+aPw2n7ApxbBLqdaL6CTED3E2KfZp/i43B+AeOLgvNF2wOhua/s87D3VP879V8L986T/d+ebThvsvLqxcH1pnUeeg+cveaC71YtuF+x5iNWvm24lfnbtCkcxFZhz++E9GaB/KfA5+rMGsTzuV8xhAf2XM9N4erw2+sM523+hhXefohtutdMUA/rmebQzyB6zQzd8VvobIaD/lLoe5kNiBlgKX/0gO7vFpAeF0Dz6AVbe4chzlUv9BqcfYarB+5ST+EgkmurAkQPZGbpRopHYX3Fh+Xx8/PT3mmYf9nYYwbauwxY6tjP04lHM4U79FvQFO5qE04M5Dahr+0xQz8HPGoMtLta83wYn999ZYgzwPNEfAPdPVKncBLvggznzayCjTP34tEPsUEI1lw+QfUngLhTdwn1LvUVmmU4NXdDhoPYyhhQ24B+BtHD+dtOPsHnVRsQfs+g762LoZ9B9IDGDUD7fOn+JjwfILRnmd8ZLpWjgDADh/JoF0If6HF8AW2uJxQOuWmurxj687pDqGfUV2gGcU71iG240fiNfYbzRsYQ1sWeQWwLsNT+KMsDTO+W9BXy8LPwHObzz3H7hphBcBMvHjLchedrRxkOYhsQ7ESAy3x3vGWxh0B7x6QJcPYQtb1m+VybpQnuxeoF1YJqAVC7RYbbOr54MIXTRoSrTEB7l+SBqHVGgLmXrwLCI01nBNUraAbhVy3YV2trlTOcjAL0F1UN+pku0lyAmEkboblgXbUAWNoynB4glzoe0H0CnJ4MN5rv0Gc4OBPvgmkzAsxe6RVweiBqCK73Q69B9BBc7/Q5iJl7MYRmv7QMp+ZuyHBObHZQOP/dgn47gG3tswAk5+BZjHc+pekb4qy95mq0Zl7NIO7RLMOpeTzu9ZjhIBJDz9oShOboEL1m1q4Ywm8PnL3uqICYwWvWfT4L4XevWYZTczdkOCceWYFHzb1m0G/Ms8ryVXhWNYh7qqba3srSBYgzgNoJGQ7IXwbwXj3dthHqC1NdbRDPVbWxhr1H91XUsxmuinepp3B1C7u6hrcH9tuF/cx3+R6zdfFKsy4WIJ4DgqVN4STeBdtwEBuAk69Ce7sQfnsBl8lA+3zrTIpHATE72uaD0CB4NdNdgmfibTgNvx1/LRystzpuc7cwiPPyv4LvqL5RU/9xOOhflC4V/MSA2g5Xs844NED7MbUM0cPM8nwcTpf8q9iG83Yrr0J4Ps4gtum5GEIbveo1FyA8cLLmguavIJ+xDWfDN/MUDs6NwbqugSE81sbNSofweAbRa2ZNtbDqpQsQ5+Bk6QKEptqYwnlwB85w3thvWAuwX/UOo8e9+N0z8sk/Qrqw0v8DAAD//wrR14cAAAAGSURBVAMARrGU3rjHSGUAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000039304 &nbsp; AN 69-14959 &nbsp; -</div>
+                                <div class="drug-patient">นายชัยพงค์  กมุทชาติ</div>
+                                <div class="drug-name">
+                                    HALOPERIDOL 5 MG./ML.INJ. &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">IM</span>
+                                </div>
+                                
+                                <div class="drug-location">LED (iL2 2-5)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEiUlEQVR4AeSZ0XYjNwxDc/v//9z6DguJo9Ekm00f1tOcRUiAkGzQdnJy9q+/H/z118eDv0Y44AO+B/cC5zNqAs46oHwAOB7rIMs3uM6gNPj16rUjnORpuIR7fQQ/vsJuCTkDtd3wz7zOoPxQNeeguJ4gs89qvNZLOMWn4DYc1OZg1l3obHGdQZ3L3Lrz7DRgvHvWuRzqbphVfcVtuNX4jvzH4aC2t4b3lRLAGAHHT0moOgavRm8HXD0v27f+/ThcntC3HnVjhp+HWa/9cbj1wj+J34bLK9LrZ08czpuHyaH63JV7wnuF8sazq92ffue7Dbczv5t2CQe1ObivPSSUb91g5+nh7AXGVcDxwybeMWgNlAfua7N/XML14bv3I1w29p26C5/zUNvtnsy6lj4zqHPhztN/p3puhIO6VFFAcUB6ADjeOjBrHvAwtG9dh/K38aWFew/sZ8C4Bzg9NwcjnORp+K1w/VXJQqA2F56qNz3864nwqnDVXvJ4FewDKC9U7XfH0+tvhesX/Mn9l+HcDtSmEgSK95m9gJrF26tzAeWxz9xehKcCacdfCvrEGLwaecdL+p/9KjCxyBbg+rdVn+ndATg+N87itxcrV7uD3sxg3hltrTA9X74t18PvxEc4mIkNAJND9W5RQHF9cgFTU98BygOzrj7v6oD5zokO8zyc+37fCBcRypyLeo0nWrh1p6kDlhPuvN0EjLc1VA9Vc77XnI0mv4RTfApGuJ64h4PaFjBk4NiqZyJCaeHOhBxqJhdQ3Jlc2AuYM3mf2Qv1Feqi6yNcF5/SX8KZXsDcoFwktL2A8sD9h94zegWUXy2As6avQ184lBeuVd+KS7jV8M78Eg5qK7tQUDOoqidbte+40/Vk1ivUnVBVnwAsB+I/yM034Ph54PgSbr1ArrFDTXQN5qVd3/Xw695+Huqcjy36LL26kF/CKT4FIxzUVhLM9CK8Vyjvbg41g6qeg9nLPSfsV6iL6PZQ5+0FFNcjF1AaVHU2wkmehhHO9GIXEGobzjuAYe9674fhiyZnYgPGD4bMoLRwa/z2Itw6wkk+Pp71/RIOajuJCfMXNNQMquqB2XcOpa/b1LMDlB+qxgPFgUjHKwrFgYNn6OMJ+SWc4lNwCWdqkYBrL++ID/YbhPnK5xyUF2bNLPelRu81MyDtto5wwPHywq/XfmMevGtrD3V3dM+kT1UT4VY4n1MT+gIoD1R1PsJJnoZLuGzis7pbAsyNrXM4z3L36pPD2at25wccn9C9l3An55uT23DA5TO4y9o35XzlXcsM6m5nK+KJDuWFWTPT2/vO1W/DOXx3/Dgc1EbdmshCoHQ5zF6uTwDST6Ev2BmB4x22m/04XC6FehComidkjScVyiN3LmBq6gGQ9vJ/BTB/h8YEjLD/Wbhc/ifV23Buc8Xuia+e8O6NBnOrmcNZgzPXB2cNinuvcwGl2Qe34WJ453oJB7UBuK89MJx9mcFZBzIanx0Ft9+h1tFnwPF5inbnc+7sEk7xKRjhTPtduIT1jJpY9c6dCzVrh1rHbta1z/p/AAAA//+lwBzwAAAABklEQVQDAONlfN7eVUVaAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000039304 &nbsp; AN 69-14959 &nbsp; -</div>
+                                <div class="drug-patient">นายชัยพงค์  กมุทชาติ</div>
+                                <div class="drug-name">
+                                    TRAZODONE 50 MG TAB &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1ins</span>
+                                </div>
+                                <div class="drug-inst">22:00 1t.prn insom, กิน 1 เม็ดเวลานอนไม่หลับ,</div>
+                                <div class="drug-location">LED (iL4 1-8)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEWklEQVR4AdyZW3YbMQxDc7v/PbeGEUiUNPKjzkdmcoKCJEh6wMTOR//8vfDXn68LfzVzwBe8B90FjmekCXCsw1hXbwVYVw0cw+usuWZOydWwmLu9Bb+eoR4hvbWmGHxlxcHcm1ycHljnoqnvGdIrXsypeBVszYEvCJ1fMX102cyBdyWvDNbm+dqTGNwLnaNV3pqrTWeNPzYHvt58AHAdmKWXcuD+6f1S86bpY3PZm18n2D9UesJAxtuHGPCxqSz9MXNZ+Jt4ay7XrfzoweH5xcE9YNbu7ATXkksTkldWfUbVE2/NpeHMvJgDXxD2fGQ4l4xW8xpLTw4oHVA1GHXg/n6EPddli7kqnj1u5nKxd7iaB18zNXCufakpFuC5lhmxZt6F5po58AuqOANGDZwDrTUvnkJyYPlVipbeRwzrPPTaPAvWVG/mlFwNiznozmUWaH9glQu5vFh5hWoC9D3KhfTxrQEptZ+u+ipawyYA7rNH8mLuqOmstWauXksxrBcB16BzjINrybVDUA6va3Dcq11H0H4BxjnVmjklV8NiDtYLwFh7dMEcCMYZ1TMHXUttZnAPdNaOClg/D6q+mKvi2eNmDnyh+YLKY1KxAO4FIi2fqBHUnzismpC8MjB8+qkvSB+4R/XUFAvJxc2cBAE8CGY1BeCa+gJwDczpDQMJ7w8NPZcAtDqg0gCg6YNwS4Dbv/4G7n15LlWbOSVXw2KuOpdZQDQAuF8J+ht6nstA6pWjVa664mg1Br+uakJ6dryY2zWesd7Mga8SE7pMcFSTlnpl8B7pwpEGY8/cpxnVBHj82wHjLnCuHc2ckqvhv8xBvw44BnMOBM6hczT9RITkrzJ4V/qf7XhqDvqvBXi5lgp5EbFyQXGFajOiAwnbBxQwxGoA1xQL4Bz6s6k+46m5eeBMeTOX677y8ODLPerNPnAvdK5z4Hr6H3Hm0pNcDOMe1Zo5JVfDU3O6EvgqMa/aDBh7YMw1mxmwllws/QjgXmCRNQfc36OLeCtM5m6VC303c+ALwMjyqgtVwNgDqG1A+ofidxIN1jng/pMA8/fIQNC17ApD15q5YfoiSTMX5zMf+aw9sx4tdeWJwVcFc9XSo5ow56oF0SpD36k+ac0cWITXWQsCLRTA86lD/0MrvQLcC50zVxms11pisJa9qYubOSVXw2IuF3jE9Qjpq7VdDL4ymDMr3s2oLl1QPEN1Ya4rX8ypeBVszYGvC52PTIP1aLqikFwM+x6wphkBnGtOAOfQWXUBeg0cqx5szaXhzPyxOV1byBHAFwSz6tIrwBr0T1L1HaHOzXHtj1ZrH5vLMvADH70IWANz7QHXsucRw9ibPWKwBmbt+TFzWvbbsDWna8x45+Ezq5nEYejXTU19O0Dv3/WkXvdtzaX5zLyYA18J9lwNg/vqxaRDr4NjMEvf4WhPeqOB9wCRDv+vYjHXui8QNHO5yjss/+lXXFHriY+4ztT4UW/V6swc/wMAAP//lpJ31AAAAAZJREFUAwAiDJTewQVFcgAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000039304 &nbsp; AN 69-14959 &nbsp; -</div>
+                                <div class="drug-patient">นายชัยพงค์  กมุทชาติ</div>
+                                <div class="drug-name">
+                                    VITAMIN B1 100 MG/ML &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">100 mg iv @12.00</span>
+                                </div>
+                                
+                                <div class="drug-location">LED (iL2 4-4)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEd0lEQVR4AdyXjW4bSQyD/fX93/mu3wqc0f7MxrlcgXqDMtSQ0qwpOwb6658H//x6PfhnhANe8D24F6gZawF1huKuWQsoDyard0B5alA1vM/OjXAenoZTuN9/gq+v0JeQ3mjHc3QZavPWQfqhPCiO3zm9d9z7T+G6+en1MhzUBmHyXViovmMPcPokpMd3IHVYrSN6Z6hnweTup16GS8Mn84/DQW0v24b9WX21IGBljW/uZcMbxo/DffUMmAGA7UVfzbgEAeueq7k77Y+Hu3v4n/aW4dziEXcvBq437h2Zsxb9nBr28/aJ+J3Vj+h+6mW4NHwyn8JBbRDWfBU4mzx6wJCA7W8uvcDwUnQP9j6wzcOac498Cqf4FIxw2dh3+GoJme8e1KbjwTyn7+hFl+N9h50b4aAeqHgE7D2oMzBagd1HZhgXRV4kcOHuJWB3L+zP++7X6H39/hnhfteP+zfC9W0Ct0HT25uiheN5Tg1sm31FuGD7Oy5adhKs7xzhdhMPOYxwsN8A1BkYUYFt81CskS3D1NQDWP+vwB6oOdiznsj9K7ZHQM1bByNchCfxW+GytQTvZ6iNRYM6Q7F65qA0KNZbAaoHJueeMMxPRbTOb4XrA59Un8Jlk1ch4kFts/dAaekJ2wPlWYvuee6A615n0gfV0zVrkR75FE5R2CisoS6zFurCegWYM/Z2QHkw+at7gFMLTA3YvuzyHJuX4TQ/HSNcT2womJvw3AFrr/dZQ/XC5OOzet/R86wvoO5QE2p3GOHumj7VO4WDr7fj1gTMr2LP4riIrlkLqGfY67lDTUTrddfUBdRd8aDOeqdwik/BKVw2kIAw352uATluDGzfVlCce4DN77/iqQHbnPUVgCEDu17vGeZFMcJBDcKenYHSrIWXCmsoz7NQEzB1zwJKsw6cEVAe7Nk+KM1aQJ3hvHj9YISL8CQe4dzeFXpYmBsDujXq3BEB5naPnj3A9lGLd8f2i/RYB7C/R32E8/A0LMNBbcLA2dQdQ/VDsXPCGVlAeVCsF0Bp9nVA6UCXt9pZYHvnN+Hw6xDu4H74cYSD2gAUu5UgGaE8mBzv2Jsz3PdC+Vf9QK7fMTDercyFYXoj3G76IYcRLsnDV/nidYbaFBS/M5cemN+k0XL38RxdjtcZ6vn6Qm+EgzLhffaCwAs7oO7Rh6qhWC2AsxYvDOseKC/Pzow8wnl4Gk7hsoE77ktIXzRYbzK9sO9Rz/wV64vveqdwVxd8qrYMB7VdmHwVEsqP54ZFP6cO6wsg0mBgfM0rQp1hsrqAqUHV6sEyXBo+mX8czndArJYADAvY3hUodg6qHk2Hwp4Vemt6uvbjcP0ya9i/WB+qLqw7AOW3AWzLycDxLigf2Fr+93DbrX/Jr2W4vpXU//U1H+eB7R2ILt/dDdV/1xPPu4TnZTjNT8cpHNSWYM09NFRfNLcmYOpQNRTrC2egNGuhLqwFIG1QF8D2zgOb7i91YR2cwsV4Ao9wpv4uXEBmrDu6njq86rvSMyPHtw6iXfG/AAAA//8n1fCJAAAABklEQVQDAD2qkd5p/dcsAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

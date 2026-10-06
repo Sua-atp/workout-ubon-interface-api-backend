@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายสุรศักดิ์  แซ่อึ้ง</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            padding: 3mm 4mm;
+            display: flex;
+            flex-direction: column;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 2mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 2mm;
+            right: 3mm;
+            width: 14mm;
+            height: 14mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-13609</span>
+                    <span>HN: 000037227</span>
+                </div>
+                <div class="header-name">นายสุรศักดิ์  แซ่อึ้ง</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD32-69-00739</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAC3UlEQVR4AeyYi1LrMAxEe/j/f763RrP1JlbihNICdpiaVVYrGT0GmHz8m+zr4zbZ19wFAzd4/pxZGmjv83ho/XCeU865J6wujIybE77/8r6dPb1GQbuKivG7xDm6/6jt8bI3C5ZgNOwWDO1UoHK9hkCr9Qn14jM/1JzQ2lmMuG7BEo6CV8GvnKRWGeoa6j5oOfm+E68Jf2c3f2Out04YYm29EVpz515pv7XgVxZyNHe3YE1gC49etKWDmLrn39KKd21mS5fgrVtwFvSXuatgTQ9i1eA4KnYLtX7uFwf1HvfLhuqHY7ZiHeeesLr9LHpH3YaYjOeXP+OKz/ln7JKrnLknXDow+llMGGLlgEfdwOkXe4/gu+FreH/8/ECb89ORfINWC/tckuZBLQp+sAMbV8Hr4WYrudboWVqoKydfQfkdC18O7McUjY7HZ7Z00Oace8LeLajdgbDdry46Quicy2wIHfB4FZzpehzUPFDtvbi5J7zXmVF8X56w1tsbIc4R9lcNwu95ejZEjN/j9l78lwveS/p7fbflCwDg8V9V74eG0LoOgoOK3nkI3mPkdy6zpSsoP0Q+WKL8Gc494awjo3GLCZd12Tte/J7OfVDXzXnZnlM21BhxGSrHGiHinVf8omCRI+PcBUOsAjyHviHZWrkf4i7XuS0thA4QtUCg+QsDLTf3hL1l3uWjtsfLhrbLUDnllr4gVD+ELZ1j0Z4914TPduyv6bsThlgpyPErBftaQuTt5YHQQUWP8ZziM65bsIJHwbcWDDEdb56mAOGD+hak+KQt9vrIVxDa+MKvz1sLXl/+E89Xwa/sulYS6vr17lOM6yDinZOuoPML+/5wTfjehKE/3QmXFdk7ve54LLSr2IuHNkY5IXywROWEyovrFizhKLhZMNTuwDE7awrUWE3G8WgM1DwQtsdmOTNus2BPNpI9d8G+As/YvhGex/m17Tq3pXMus6Xr4XQT/g8AAP//Ju1kgwAAAAZJREFUAwDBmHzF4xcLgAAAAABJRU5ErkJggg==" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <span class="med-name">TRAZODONE 50 MG TAB<span class="med-bin"> (iL4 1-8)</span></span>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <span class="med-name">FOLIC ACID TAB. 5 MG<span class="med-bin"> (iL7 4-1)</span></span>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <span class="med-name">VITAMIN B1 100 MG TAB<span class="med-bin"> (iL4 2-3)</span></span>
+                        <span class="med-qty">#3</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                <div class="page drug-page">
+                    <div class="drug-body">
+                        <div class="drug-meta">8 ก.ย. 2569 &nbsp; ตึก อายุรกรรมชาย &nbsp; เตียง 8</div>
+                        <div class="drug-hn">HN 000037227 &nbsp; AN 69-13609 &nbsp; -</div>
+                        <div class="drug-patient">นายสุรศักดิ์  แซ่อึ้ง</div>
+                        <div class="drug-name">FOLIC ACID TAB. 5 MG &nbsp; <span class="drug-qty">#1</span></div>
+                        <div class="drug-timecode">t1+1</div>
+                        <div class="drug-inst">1TOD.pc ช, กิน 1 เม็ดวันละ 1 ครั้ง, หลังอาหารเช้า</div>
+                        <div class="drug-location">LED (iL7 4-1)</div>
+                        <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEUklEQVR4AeyXjXITQQyD+/H+7wzVOfJ6/65JU4a5GxiEbEu7FzlpaX/9vvGfXx83/pPhgA94DdoLxBnVFdDm0Gp5IHporHkFhKYZRA3Ps85lODV3wxTu80vw4yvUJdgLsdWqjTXMnvE8zB7fY+8Z2yuewml4F2zDQWwQGp+F9jYh/PYC0yfBms64NmtW4XlliGdA46q73oaz4cr8djiI7XkJ3nrtXY8MjKPsgeO7dw6+UbwdbnwmxItySCAtwPYFVz+QZ94pfjzcOy/mp89uw3mTlc8eDhzviv0QfT1jzTP1riH8mgmer1j6iJVvG25lvtpsCgexQdjzKqQ3CXHOffVCrwFV/rIGjk8H7LleMoWr4tXrDOdNv8LPhofYtO+G6Ov5UXMvj+tXWOcyHMwPlEGAXoPoAckHgOMjczRf/FNf5M4KcR+c83gewq95hlNzN2Q4b9MBoW1gnNlb2R7Pau8aHnc+BhA9NPZ588O6JYizK0OGW4lXn03hoN8EkBm9TeD4+oLGaVoUPmdeWPI3B4g77fGZHdsH/TnNp3Aa3gUZDiL5uKEaFGZP1Vc1kGOge8cl+HmqBffQewHJHaD9rtgJjybDPfpb0RQOmLY7JobwaO5NqxagaeoFmGearwC91/eL7Yfw1JlqwR5xhpNQIXFE1VVDPAQYrdnLt4NMwOkyoenyVwDZAsc9fpaEDKfmbshwEMkd0BuobA2a17q1sdccwg/Bmu2wOm8vxPkzj73iDKfmbshwz25DC7BXrP5ZyC9A/w5oZviu2rs22yOG/i6IXlqGU3M3ZDhoiRUS+r7OoGnQankMWM+tf4ch7oRgvZNn92S4M5M1XVYBWEoGjm/JOSgFhOY7gFSB4xz0LAPEzOfM8P8nlI/8qVybErwd1RCbUy1A66tPmlHnrs32iKHdpd6eFUPvld+A0HxO85c+ljpwJbwUDvrtaEsOq1pwD+EFPJq+puQ30jQUQJ6zBDHTWYjaWuUhXJWuX2c4iA1AzzWiNiVA7wHSJl3wQDVwbL/ONFcPoakXIHoIlucMOlMB7VyGO7vgqlqGq+lrrWDuVQvuxeorIDYnTYD2f5F6wX5ommfShbHXzLBWGfrnSstwECI8z7rAgDi3egEQGgT7jBjmmeYVsPdAaKvnZrh62V3qKZw3cMY1/OiD2KQ90mutHsKj2rBnxWeeM20Kt7r8qrNtOIjtQuNVSGg6kBag+/afwmfhbQOfXf8X6M5B9NDYJ6DNIGpr4m04iVfH2+H8Lpi9EPfQvt1DbBeC5YGofW5keQxrY6/5avZ2OF18Bj0U+gCaCcDZ0UnTGQE4PrqqDYgZBOvwXw+nh/wrbMN5I5WfeZH2Q2wQ2sfS5yE0e8XWVgzhh2D5hZVXc0HaNpzEq2MKB7Ed2HMNDb2vamOtjVZIhzivWrCuWoD9Ow9xFmaPzk7hNLwLMpw39gprCaNfM6HO1e9g36h7Lramegd7Kv8BAAD//wakg9QAAAAGSURBVAMAdUB53gWPi2wAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                    </div>
+                </div>
+                <div class="page drug-page">
+                    <div class="drug-body">
+                        <div class="drug-meta">8 ก.ย. 2569 &nbsp; ตึก อายุรกรรมชาย &nbsp; เตียง 8</div>
+                        <div class="drug-hn">HN 000037227 &nbsp; AN 69-13609 &nbsp; -</div>
+                        <div class="drug-patient">นายสุรศักดิ์  แซ่อึ้ง</div>
+                        <div class="drug-name">TRAZODONE 50 MG TAB &nbsp; <span class="drug-qty">#1</span></div>
+                        <div class="drug-timecode">t1ins</div>
+                        <div class="drug-inst">1t.prn insom, กิน 1 เม็ดเวลานอนไม่หลับ,</div>
+                        <div class="drug-location">JVM (iL4 1-8)</div>
+                        <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEbElEQVR4AdyWC3LjSAxD583977ybJwYtqtWSPZWprbVSQfgBSBu0neT3Pw/++v3rwV/DHPAL/gzeBdYzcgIwbAC2x9iKrx9QNZzjFz2+4czDfc/hYc7iaTiZ+/oI/nqFfoQrbTTyUFc2F3Cs7UWfCKVJbVT3CuqCk7kQT4iX5qAuB3u8Mwy7DhhS2PPRvEnmV2YlBbbPLuxxpbs0txJ/Wu/H5qCul4vnAHDsy0P1uib5HOGonfl36h+by4PA6yejwY7MGtOH13vUv4O/Zu6dB/uvNZfmcske755c15l3LdSrAcfYdVCcPdHn51x+xqyxvjQn+ek4mYO6IFzHO9NQc7ksMP4pyFzn0nsnQu2G69j3nMx18tPzYS7X/JP4jnn3QV3aXMBeQ+XZBVWrE/aNfwrnhjmopTZnwJGDqoEhBbb/GtKAY52+MU8U9rdsevICah7uo9oOKL29Yc7iaRjmcjko51BRwzOXunPpzVFNALWT76g2XKK9jvSvItTOFT/MrchP7700B5w8AtvnywufyO8GlAbOnyvnBOya77FtL5By/BlRv0KEwDab2vjSnKJPxTAH5fzuOjPXTUPNQ8VwzsCxB1XLRQd7zz5UDXuMNhH2d0V6PQ5zvfmUfJjzWuIdY1DX7FpnRXrmwtoozIW5MJ8Bx93qgmihNPbTMxepjcMc1IDNDqg+7NElQh3sfcDWAcD2QYd1PIgXBexzMw2MFrA9js9LSAxzFk/DMKdbAXUBqGhvBhQHjHvMmkF8JeG+0u17rrfm9487Dji9Ot9jyzDMLdkPbw5zcLxKLgicLIaT6Lk1sF3XPIBjD/Y684mZSb2K0RihdkUHVcsNcxZPw8kc7M4160WMAoqDinJQuXwH7H11HV33KgeGBNjeFVDRnYNcJCdzswZqEez/DbhUwN6b53oNtSM9Z0VqI5QGjrFzznTA/eO/NOfyT8Uw1y9iHkPmAZyvGt1VzKxxpYHaKf8KUNp39qgZ5iyehktzUFeCPcZ8LpzaCKULlwhIHwBsvxhsRme+ApQWGDSwzTsLlQ+yJZO5xjwgHeagLgAV483r9Nwajhp5+wKOXO9BcfaEczOgNFBx5ufaPR2wzw1z89AT6mGuu++5JlObi9RGqEtBRfkOOP8tgrMWqudOkR3mM8L1COf5YQ6KhPdjX373BKB2Rt+1UFx60fQIpem95FDcan6Yi/hJ8WQuF7iL/QDRQV0wHFQtn565gOLg/JaNtkdnRO8lty9S93gy18lPzy/NwX5dqHxlForzegKqXmnf6cFxHqqGPWYP7D2oPJzx0pzkp+PH5ny1xHwIe6L3oa5rX6y43jNXF1iLub7q/diciztWDxx+xcG14cwlZh6OM/ahelDRmb9uzqX/F1ya8xoz7p401MXgGJ3JHrjm1F0BjnPZt9J37tLcavDTeidzcLwSnOtuEorvF5Of695bcfJi5uD8hx7qMWGP85y7TuZsPgXDXJz/SfQI0ZuLubZ3BbV3nLyIxvwK0fT4LwAAAP//opiHEgAAAAZJREFUAwCvE6/e9f4g4QAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                    </div>
+                </div>
+                <div class="page drug-page">
+                    <div class="drug-body">
+                        <div class="drug-meta">8 ก.ย. 2569 &nbsp; ตึก อายุรกรรมชาย &nbsp; เตียง 8</div>
+                        <div class="drug-hn">HN 000037227 &nbsp; AN 69-13609 &nbsp; -</div>
+                        <div class="drug-patient">นายสุรศักดิ์  แซ่อึ้ง</div>
+                        <div class="drug-name">VITAMIN B1 100 MG TAB &nbsp; <span class="drug-qty">#3</span></div>
+                        <div class="drug-timecode">t1+3</div>
+                        <div class="drug-inst">1T tidpc, กิน 1 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น</div>
+                        <div class="drug-location">LED (iL4 2-3)</div>
+                        <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEe0lEQVR4AdyXgXLbSAxD8/r//3yXJxor7kqyk0tuplamMEgQuzZoO23//HPjnz8fN/4Z4YAP+B7cC9QZ6w4oHejyVAPjOTOA0tLLUBp8nT03wtncDYdwn1/Bj1c4WwLMWz3zRIPy+jxnmjqUJ3NZ/RX0BYdwGdyBL8NBbQ52PgucTWa29tFlqLviAZQnANv3MJ5p+GigPLDzYzTRZbjJ9abNj8NBbS/5Ye59B2DWoHpnOWfdAeXJ/L/wj8PlBeXJ11492sqA4w3A9nHcml96+HG4X3od/8s1l+HWLdt/5RVAvQP6BVQPjOPAeJf0dMQULX3nzDr3eerLcDG8Mx/CQW0VrrkHhvJli32WOjO49kLNcgbmXh1Kg2vWFxzCZXAHHuGy3e9wXwDUNnMe9r77eq03vbWAOhddVv8uPDfCwXwpVA/o2wBsvwhg5zzpZjh5gKMXSut2mLV+L8yznANSHl6XgxHO5m74Ujhg20zCZ6sy1MxawNyr5dzgRwE8qiMB03PqgNKg+Nnd+r8UTuM74hAOaisJ43ZWQHmA8X+/+MNQnvRn7L3w3AeMo/o7xuCz6Lr1p/RxCKd4FxzCmboD9s0ldOb2wPbdgGK1Fd3vbO2vtOiygOvncC5g9xzCabgLvhUOaitQ7DuQRVifIXMZ6px1kDNrHx3273XXoO6CmXOPPMKtBx0KdagLrDsALRuA6eMJ1W/DiwfgYvIx7vr4/AFGD8ewvqZP2/bHWtiMcDZ3wwgHtR1TC6ge9k3BrgHbLvR2bGJ7AMbW44PSmm2UMM88k6G1SN9ZXXRthOviXeoRztQiwaxFetl+hXrH2TwazO+K56A0KI43rCc1lAeOrG/FCLcO7tCPcDBvI+HcGswz2Pv4oLT0z9g7g9UH8z3AsORMeAxaAWzfcaURLgfCDoNoK2feGfbL1T0jX8F5x5Wv6zA/R5/lLrURzuZuGOHgehswz2DvoepsLAylw87Plgfly/l47aFm0To7F1AeKNYzwtncDSOc6UUCwr4BdQGlWa9Yz/V5ZisDQ4o/AjB+MWQGu6ZPXRbWwjoY4Uq41+MhHNR23IKA6oGRHBhbHeJSwGuP9+cYlB+Kz/RonWH2e6fQcwineBccwplaJKD1FfRAbQ6K1UTOwP4P72jOV1zNonfOWSDlKY9wwPZRg6/z6Y1PRJjv1gqzlhDOAihP+nC8MpQHivWMcDZ3wyGcW3iFsyWsZ2DfIOy1Z+O1XgGz1/mVH3A8oXsP4SbnmzeX4YDDd/AsazYFs7974wlDeZ95MoPyws6ZeV+ve69+Gc7hu+PH4aA26tbEupAzLR4g5fiUDOFReH7FY7QRsJ3dmuXhx+FyH5w/CRDL9iJg7x08e+HOYfcD2x3qAva/Q+0F7J5fC+fFfxsuw60btT978eod8XQN9m1mLuuBmsHMzoUeWVgLa9FrqPPqwWW4GN6ZD+GgNgDX3APD7MsMSrd3wx1qApCeAo6e3OVBYPseRgs7O4RTvAtGuCT+DruEV349K16dWefr+d7H27XU/wIAAP///XITJQAAAAZJREFUAwBZepres8RbgwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                    </div>
+                </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

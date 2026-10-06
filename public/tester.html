@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interface API Tester</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: rgba(255, 252, 247, 0.92);
+            --panel-strong: #fffaf2;
+            --text: #24190f;
+            --muted: #6e5a47;
+            --accent: #0f766e;
+            --accent-strong: #115e59;
+            --line: rgba(36, 25, 15, 0.12);
+            --error: #b42318;
+            --success: #0f766e;
+            --shadow: 0 18px 45px rgba(56, 39, 24, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 26%),
+                radial-gradient(circle at bottom right, rgba(196, 128, 54, 0.18), transparent 22%),
+                linear-gradient(135deg, #f4efe6 0%, #efe3d4 100%);
+        }
+
+        .shell {
+            width: calc(100% - 24px);
+            margin: 12px auto;
+            display: grid;
+            gap: 20px;
+            min-height: calc(100vh - 24px);
+        }
+
+        .hero,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .eyebrow {
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 12px;
+            color: var(--accent-strong);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(32px, 6vw, 56px);
+            line-height: 0.95;
+            font-weight: 600;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 720px;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .hero-actions a,
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            text-decoration: none;
+            font: inherit;
+            cursor: pointer;
+            transition: transform 120ms ease, opacity 120ms ease, background 120ms ease;
+        }
+
+        .primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .secondary {
+            background: rgba(17, 94, 89, 0.08);
+            color: var(--accent-strong);
+            border: 1px solid rgba(17, 94, 89, 0.16);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 380px minmax(0, 1fr);
+            gap: 20px;
+            min-height: 0;
+            align-items: start;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 12px;
+            max-height: calc(100vh - 24px);
+            overflow: auto;
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 14px;
+        }
+
+        label {
+            display: grid;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--panel-strong);
+            color: var(--text);
+            padding: 12px 14px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 280px;
+            resize: vertical;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .quick-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .menu-group {
+            display: grid;
+            border-radius: 18px;
+            background: rgba(17, 94, 89, 0.04);
+            border: 1px solid rgba(17, 94, 89, 0.1);
+            overflow: hidden;
+        }
+
+        .menu-group summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .menu-group summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .menu-group summary::after {
+            content: '+';
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .menu-group[open] summary::after {
+            content: '-';
+        }
+
+        .menu-group h3 {
+            margin: 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-strong);
+        }
+
+        .menu-items {
+            display: grid;
+            gap: 10px;
+            padding: 0 14px 14px;
+        }
+
+        .quick-list button {
+            text-align: left;
+            background: rgba(17, 94, 89, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(17, 94, 89, 0.12);
+            border-radius: 16px;
+        }
+
+        .quick-list strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .content {
+            display: grid;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        .request-meta {
+            display: grid;
+            grid-template-columns: 140px minmax(0, 1fr);
+            gap: 12px;
+            align-items: end;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .response-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(17, 94, 89, 0.08);
+            color: var(--accent-strong);
+        }
+
+        pre {
+            margin: 0;
+            border-radius: 18px;
+            padding: 16px;
+            background: #1a1714;
+            color: #f8f3ec;
+            overflow: auto;
+            min-height: 420px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .hint {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .status-ok {
+            color: var(--success);
+        }
+
+        .status-error {
+            color: var(--error);
+        }
+
+        button:hover,
+        .hero-actions a:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        @media (max-width: 960px) {
+            .sidebar {
+                position: static;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .request-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+        <section class="hero">
+            <p class="eyebrow">DB_Middle Toolkit</p>
+            <h1>Interface API Test Console</h1>
+            <p>หน้าเว็บนี้ใช้ลองเรียก endpoint ของ API โดยตรงจาก browser โดยแยกเมนูตามไฟล์ route คือ `ms_users` และ
+                `prescriptions` พร้อมลิงก์ import collection เข้า Postman ได้ทันที.</p>
+            <div class="hero-actions">
+                <a class="secondary" href="/tools/">Open API Guide</a>
+                <a class="primary" href="/tools/postman/Interface_api.postman_collection.json" download>Download Postman
+                    Collection</a>
+                <a class="secondary" href="/tools/postman/Interface_api.local.postman_environment.json"
+                    download>Download Postman
+                    Environment</a>
+            </div>
+        </section>
+
+        <section class="layout">
+            <aside class="panel stack sidebar">
+                <div>
+                    <h2>Quick Requests</h2>
+                    <p class="hint">กดที่หัวข้อก่อน แล้วค่อยเลือก function ภายในของแต่ละไฟล์ route</p>
+                </div>
+
+                <div class="quick-list" id="apiMenu">
+                    <details class="menu-group">
+                        <summary>
+                            <h3>System</h3>
+                        </summary>
+                        <div class="menu-items">
+                            <button type="button" data-template="health"><strong>GET /health</strong>เช็กการเชื่อม SQL
+                                Server</button>
+                        </div>
+                    </details>
+
+                    <details class="menu-group" open>
+                        <summary>
+                            <h3>ms_users.js</h3>
+                        </summary>
+                        <div class="menu-items">
+                            <button type="button" data-template="list"><strong>POST /api/users</strong>ค้นหาผู้ใช้ด้วย
+                                username, password, userbarcode</button>
+                            <button type="button" data-template="detail"><strong>POST
+                                    /api/users/:userID</strong>ดึงข้อมูลผู้ใช้รายคน</button>
+                            <button type="button" data-template="create"><strong>POST
+                                    /api/users/create</strong>เพิ่มผู้ใช้ใหม่</button>
+                            <button type="button" data-template="update"><strong>PUT
+                                    /api/users/:userID</strong>แก้ไขข้อมูลผู้ใช้</button>
+                            <button type="button" data-template="remove"><strong>DELETE
+                                    /api/users/:userID</strong>ลบผู้ใช้</button>
+                        </div>
+                    </details>
+
+                    <details class="menu-group">
+                        <summary>
+                            <h3>prescription.js</h3>
+                        </summary>
+                        <div class="menu-items">
+                            <button type="button" data-template="prescription-list"><strong>POST
+                                    /api/prescriptions</strong>ค้นหา prescription</button>
+                            <button type="button" data-template="prescription-ward-summary"><strong>POST
+                                    /api/prescriptions/ward-summary</strong>สรุปยอดตาม ward</button>
+                            <button type="button" data-template="prescription-detail"><strong>POST
+                                    /api/prescriptions/:prescriptionno</strong>ดู prescription ตามเลขใบยา</button>
+                        </div>
+                    </details>
+                </div>
+
+                <label>
+                    Base URL
+                    <input id="baseUrl" />
+                </label>
+
+                <p class="hint">ใช้ URL ของหน้าปัจจุบันอัตโนมัติ หรือระบุ URL ของ API ที่ต้องการทดสอบ</p>
+            </aside>
+
+            <div class="content">
+                <section class="panel stack">
+                    <div>
+                        <h2>Request Builder</h2>
+                        <p class="hint">รองรับ GET, POST, PUT, DELETE และส่ง JSON body ไปยัง API</p>
+                    </div>
+
+                    <div class="request-meta">
+                        <label>
+                            Method
+                            <select id="method">
+                                <option>GET</option>
+                                <option>POST</option>
+                                <option>PUT</option>
+                                <option>DELETE</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Path
+                            <input id="path" value="/api/users" />
+                        </label>
+                    </div>
+
+                    <label>
+                        JSON Body
+                        <textarea id="body">{
+    "username": "1",
+    "password": "1",
+    "userbarcode": "1"
+}</textarea>
+                    </label>
+
+                    <div class="actions">
+                        <button class="primary" id="sendButton" type="button">Send Request</button>
+                        <button class="secondary" id="formatButton" type="button">Format JSON</button>
+                        <button class="secondary" id="clearButton" type="button">Clear Response</button>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="response-head">
+                        <div>
+                            <h3>Response</h3>
+                            <p class="hint">ผลลัพธ์จาก API จะแสดงด้านล่าง</p>
+                        </div>
+                        <div id="status" class="badge">Waiting</div>
+                    </div>
+                    <pre id="output">Ready.</pre>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const templates = {
+            health: {
+                method: 'GET',
+                path: '/health',
+                body: ''
+            },
+            list: {
+                method: 'POST',
+                path: '/api/users',
+                body: JSON.stringify({
+                    username: '1',
+                    password: '1',
+                    userbarcode: '1'
+                }, null, 2)
+            },
+            detail: {
+                method: 'POST',
+                path: '/api/users/1',
+                body: ''
+            },
+            create: {
+                method: 'POST',
+                path: '/api/users/create',
+                body: JSON.stringify({
+                    userID: 'U001',
+                    fullname: 'John Doe',
+                    positioncode: 'DEV',
+                    userbarcode: '123456789',
+                    username: 'jdoe',
+                    password: 'secret',
+                    photo: null,
+                    adminid: 'A001',
+                    pathphoto: null,
+                    wardcode: 'W01',
+                    roomcode: 'R01',
+                    firstname: 'John',
+                    lastname: 'Doe',
+                    departmentcode: 'IT'
+                }, null, 2)
+            },
+            'prescription-list': {
+                method: 'POST',
+                path: '/api/prescriptions',
+                body: JSON.stringify({
+                    prescriptionno: 'RX0001',
+                    hn: '123456',
+                    an: '654321',
+                    orderitembarcode: 'ITEM001'
+                }, null, 2)
+            },
+            'prescription-ward-summary': {
+                method: 'POST',
+                path: '/api/prescriptions/ward-summary',
+                body: JSON.stringify({
+                    startDate: '2024-10-30 00:00:00',
+                    endDate: '2024-10-30 23:59:59',
+                    wardcode: '03',
+                    genorderdatetimeIsNull: true
+                }, null, 2)
+            },
+            'prescription-detail': {
+                method: 'POST',
+                path: '/api/prescriptions/RX0001',
+                body: ''
+            },
+            update: {
+                method: 'PUT',
+                path: '/api/users/U001',
+                body: JSON.stringify({
+                    fullname: 'John Doe Updated',
+                    positioncode: 'LEAD',
+                    userbarcode: '123456789',
+                    username: 'jdoe',
+                    password: 'secret',
+                    photo: null,
+                    adminid: 'A001',
+                    pathphoto: null,
+                    wardcode: 'W02',
+                    roomcode: 'R09',
+                    firstname: 'John',
+                    lastname: 'Doe',
+                    departmentcode: 'IT'
+                }, null, 2)
+            },
+            remove: {
+                method: 'DELETE',
+                path: '/api/users/U001',
+                body: ''
+            }
+        };
+
+        const baseUrlInput = document.getElementById('baseUrl');
+        const methodInput = document.getElementById('method');
+        const pathInput = document.getElementById('path');
+        const bodyInput = document.getElementById('body');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const sendButton = document.getElementById('sendButton');
+        const formatButton = document.getElementById('formatButton');
+        const clearButton = document.getElementById('clearButton');
+        const apiMenu = document.getElementById('apiMenu');
+
+        baseUrlInput.value = window.location.origin === 'null'
+            ? 'http://localhost:5050'
+            : window.location.origin;
+
+        function setTemplate(name) {
+            const template = templates[name];
+            if (!template) {
+                return;
+            }
+
+            methodInput.value = template.method;
+            pathInput.value = template.path;
+            bodyInput.value = template.body;
+        }
+
+        function setStatus(text, isError) {
+            status.textContent = text;
+            status.className = 'badge ' + (isError ? 'status-error' : 'status-ok');
+        }
+
+        async function sendRequest() {
+            const method = methodInput.value;
+            const url = baseUrlInput.value.replace(/\/$/, '') + pathInput.value;
+            const rawBody = bodyInput.value.trim();
+            const options = {
+                method,
+                headers: {}
+            };
+
+            if (method !== 'GET' && method !== 'DELETE' && rawBody) {
+                try {
+                    options.body = JSON.stringify(JSON.parse(rawBody));
+                    options.headers['Content-Type'] = 'application/json';
+                } catch (error) {
+                    setStatus('Invalid JSON body', true);
+                    output.textContent = error.message;
+                    return;
+                }
+            }
+
+            setStatus('Loading...', false);
+            output.textContent = 'Sending request to ' + url;
+
+            try {
+                const response = await fetch(url, options);
+                const text = await response.text();
+                let parsed = text;
+
+                try {
+                    parsed = JSON.stringify(JSON.parse(text), null, 2);
+                } catch (error) {
+                    parsed = text || '[empty response]';
+                }
+
+                setStatus(response.status + ' ' + response.statusText, !response.ok);
+                output.textContent = parsed;
+            } catch (error) {
+                setStatus('Request failed', true);
+                output.textContent = error.message;
+            }
+        }
+
+        function formatJson() {
+            const rawBody = bodyInput.value.trim();
+            if (!rawBody) {
+                bodyInput.value = '';
+                return;
+            }
+
+            try {
+                bodyInput.value = JSON.stringify(JSON.parse(rawBody), null, 2);
+            } catch (error) {
+                setStatus('Invalid JSON body', true);
+                output.textContent = error.message;
+            }
+        }
+
+        document.querySelectorAll('[data-template]').forEach((button) => {
+            button.addEventListener('click', () => setTemplate(button.dataset.template));
+        });
+
+        apiMenu.querySelectorAll('.menu-group').forEach((group) => {
+            group.addEventListener('toggle', () => {
+                if (!group.open) {
+                    return;
+                }
+
+                apiMenu.querySelectorAll('.menu-group').forEach((otherGroup) => {
+                    if (otherGroup !== group) {
+                        otherGroup.open = false;
+                    }
+                });
+            });
+        });
+
+        sendButton.addEventListener('click', sendRequest);
+        formatButton.addEventListener('click', formatJson);
+        clearButton.addEventListener('click', () => {
+            setStatus('Waiting', false);
+            output.textContent = 'Ready.';
+        });
+
+        setTemplate('list');
+        setStatus('Waiting', false);
+    </script>
+</body>
+
+</html>

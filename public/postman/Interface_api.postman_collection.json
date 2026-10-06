@@ -1,0 +1,239 @@
+{
+    "info": {
+        "name": "Interface API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Collection for testing the DB_Middle SQL Server API. Import the matching environment file to manage baseUrl and userID separately."
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5050"
+        },
+        {
+            "key": "userID",
+            "value": "U001"
+        }
+    ],
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/health",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "health"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "DB Test",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/db-test",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "db-test"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Users",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"username\": \"1\",\n  \"password\": \"1\",\n  \"userbarcode\": \"1\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/users",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get User By ID",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/{{userID}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "{{userID}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Prescriptions",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"prescriptionno\": \"RX0001\",\n  \"hn\": \"123456\",\n  \"an\": \"654321\",\n  \"orderitembarcode\": \"ITEM001\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/prescriptions",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "prescriptions"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Prescription Ward Summary",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"startDate\": \"2024-10-30 00:00:00\",\n  \"endDate\": \"2024-10-30 23:59:59\",\n  \"wardcode\": \"03\",\n  \"genorderdatetimeIsNull\": true\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/prescriptions/ward-summary",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "prescriptions",
+                        "ward-summary"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Prescription By No",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/prescriptions/RX0001",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "prescriptions",
+                        "RX0001"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Create User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"userID\": \"U001\",\n  \"fullname\": \"John Doe\",\n  \"positioncode\": \"DEV\",\n  \"userbarcode\": \"123456789\",\n  \"username\": \"jdoe\",\n  \"password\": \"secret\",\n  \"photo\": null,\n  \"adminid\": \"A001\",\n  \"pathphoto\": null,\n  \"wardcode\": \"W01\",\n  \"roomcode\": \"R01\",\n  \"firstname\": \"John\",\n  \"lastname\": \"Doe\",\n  \"departmentcode\": \"IT\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/create",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "create"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Update User",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"fullname\": \"John Doe Updated\",\n  \"positioncode\": \"LEAD\",\n  \"userbarcode\": \"123456789\",\n  \"username\": \"jdoe\",\n  \"password\": \"secret\",\n  \"photo\": null,\n  \"adminid\": \"A001\",\n  \"pathphoto\": null,\n  \"wardcode\": \"W02\",\n  \"roomcode\": \"R09\",\n  \"firstname\": \"John\",\n  \"lastname\": \"Doe\",\n  \"departmentcode\": \"IT\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/{{userID}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "{{userID}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Delete User",
+            "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/{{userID}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "{{userID}}"
+                    ]
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นางทองใบ  จารุเกษม</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-15667</span>
+                    <span>HN: 001748976</span>
+                </div>
+                <div class="header-name">นางทองใบ  จารุเกษม</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: 69-106633</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAADCElEQVR4AeyYCbKjMAxEef/+d57BaNq0wY5JkRTzDSkcyd2SiJY4y8+fmz1+pps97p0wMMH51RoaiNg1HoIDChr46Gu6d4eL0g66aXZ4Prynd1evRorndhAjKy5J56Un/N0lX5fNhN1oJL2bMEQHoC57xYC6HwQuf4g9IKgpgZcHWdNxJroJzzZDXU/C32zn0UPnm6/h6fA3q/s/xL6kw7CesioC7DFxn5SXJPzJBN6N1U24d9C8c0OILroPBOb3cb6mu21Nr/n8w6ZuwjIcRT4Jq5MQowbHpXxbUuPnvDBY7+O8dFh5OKbL1+W9O6xqn5VeUdchOuOYdL+nsCQdP6OnWGndu8OpAqOvosMQIwfkvIGXvz1hz2fnWamN4QznC8I/AxsFgofjchOi2BYJF8ygmydhNRZihGoj6ZjskxQO4QskeLdkl6RIoPrWEe8y+aVVwxIO+1iyvXeHU3W2C/bVAlSwQgJLlzwGBAZkW2CxA/JfwZmcFfeft82rZ1fj793hZikHIooOwzpqEHovVx8b6RC+QOEOLKPsILQxwE13OrDEg1LuDA0oEjZ8UHXq/wGgriXpVQCW6vYw51OM1urZOS+9FUu47Fw+HfZqjKgXHdYouPSkHZf+Dg/xNoBVuv9RHVZ/CN19YY+JLxIWOLK8d8IQowDnpE+IRt+l8xD3ch4CA7Kp8zUdWD41YP26CiumQPfusKqQZK2KPSz5bResVYbQ3UYxa1jihEP4AoK6MvlryfjpsCoxqux2GMiHAez1s4WBiOlxIDDA4awDy2vKwEaBNt9NeBPr128vSVgHSZKqIERXAEGLBHbdTH5pLQaVp8SlVaH6v5ZqTr8Zu6TDVxbskoQhxhTWb0VehDSOWo5Lh9UfQhf3Us7kJQnP973sehLell6j1ZJb++2+5Scc9iMJgQHbcMtevi25GM1PwHLCA/MurqfDUYcpVwY4rE+VB7z2V5fcVZhL5yFi1jAgwzX/p8O5PIMqRYd9BM7oXqteHNm6nTCXzktv8Y5v9SLhLTni/i8AAAD///zPN6kAAAAGSURBVAMAFNmRxWgVKH0AAAAASUVORK5CYII=" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CALCIUM CARBONATE 1250 MG<span class="med-bin"> (iL8 3-7)</span><span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRAMADOL 50 MG<span class="med-bin"> (iL4 1-6)</span><span class="med-timecode">t1+3</span></div>
+                        <span class="med-qty">#3</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CEFTAzidime 1 G. INJ.<span class="med-bin"> (iL2 5-1)</span><span class="med-timecode">2g v 8hr</span></div>
+                        <span class="med-qty">#6</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">PARACETAMOL TAB. 500 MG<span class="med-bin"> (iL8 5-1)</span><span class="med-timecode">tt1</span></div>
+                        <span class="med-qty">#4</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN D2 20K.IU<span class="med-bin"> (iL4 2-5)</span><span class="med-timecode">t2w อ</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">5 ต.ค. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 001748976 &nbsp; AN 69-15667 &nbsp; -</div>
+                                <div class="drug-patient">นางทองใบ  จารุเกษม</div>
+                                <div class="drug-name">
+                                    CEFTAzidime 1 G. INJ. &nbsp; <span class="drug-qty">#6</span>
+                                    &nbsp; <span class="drug-timecode">2g v 8hr</span>
+                                </div>
+                                <div class="drug-inst">22:00 น.</div>
+                                <div class="drug-location">LED iL2 5-1</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEcElEQVR4AeSWgXIjNwxD8+7//7n1WwaSdiXFcdLp1NubQ0gCkGzQdpw/f93435+PG/9r4YAPeA2rvcD5Dj1QnP0IKB56HfX00HX4Xu/ZFs7hbpjCPT6CH88wLgFqkyNnnzuAdh+UF6qOvvjlBHSPs4jnq6ovmMJFuEPdhoPaHPS6CpwtRssMdc4Zqr96nOGsyT0D1BnodXVmG25lfjfuHwsHtcXrAoAr1X4r+6oGwMFP5l8Qvw4H5ycFNedJjzXPM1zmsUKdH7mf9r8O99MH/jfObcNlu2NdPaFRt48H6hWAXtVFPFYoXX6E2g6jL/3Kuw23Mr8bN4WD2iTs6xgSyjdy9uNG08PZC/MXvGd3gDoP+zqencKN4rv3LVy2+0o1fPxQ21zNUJr+Z4Dy5h796V+pnmvhoC6VFNBn6P1Vc/4K0N968UG/D3qvngBw5tUCmDWYuRYuB+9UW7hs7BoOuFLLv/JjAp7/pfFp9jE/21ZgPg8z5wHAskULt3W8sTCFA06bd7tBckL3RPuqQvmvHpg/j3mMeJ3H/jrD+W6oWd8UTvIu2Ia7bmsMvNKgNgZzvfqhPPLjvaseaDRwelc14dFAad4pHtTHNpziu+NpOKiNAC0rcGzQDUH1EeVE5u9Wz4yAulcOqr/epXblxrmFg7rAAwL6nAPQOT3yVmEvoDz2AcxctGcVaBYfR4SAro0cFN/CRbxTbeHciEg4ewG1BXlnARxvS+hVfoXVufgA5QPA6c54rIdh+AHlXWmD7X/2CwVqK1B13A50Tl5kU1DaddYDZy2elSYn4oH+RQ/ne4DYlrW9LZfqm5PbcG5PwLwd4Ph8rLJDaZ4V0Dd/9QON0iuA0907Tl60Cz4bOeG4Dae4g4cFzE9cXuzOXnm9Iry9gHNIdXkBpQHSB+QF0Jbzo3DHbW/wo4WDSmx6keduH4SD8mYeK5QGVT0Lvb/OOQvlyfxV9Y4gPpjPt3Ax3am2cNkE1AagqmGh+njGCmvNcwJe+1zC+T7Aaw4A7fN0EI8f43MZ+4d0/RKXug/aKwe1lTG9/SoqlHelhfOsyDxW2J/3jIC9B76ntXDjg9+lb+HcllgFkxfR7EXmVYXarj6oPj45kdnqLGDtVQv0Cygv4Hhg9LRwwPFhhe9Xbxsvc4Y6bx/EA6VB1ehWmDl5AWvNe9V3aOF2hnfmp3Bu4xleCQy1deCVYydvns+JfAzQv2aA4533oNv/KVxTbtBsw0FtAnpd5YWuA80ybnvsNYwzMG1cTwClQ6/RvAeKDwd93oaL+Z3rr8O5PbFbghr0bV596iOuunN0+xHAOB796P11OOB4W42XHo8y/IiWCnVmsBx3QP8FEc0zMPvV1a6A7v11OB/kv4ptuOtGnFch5EU0ewG1QSDStypwvIreIYDpnLxQAA4/VJULtuFieOc6hYPaAOzrGBjKN3L2bjZwFlDekYfi1EU0KD7zWPUJ6J/R6PLBFC7CHWoLl+SvVBcQv/0zrLzhUnPHdQ4/Vj3jbC8n7P8GAAD//7JksqEAAAAGSURBVAMAR6Rn3iUH/OUAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">5 ต.ค. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 001748976 &nbsp; AN 69-15667 &nbsp; -</div>
+                                <div class="drug-patient">นางทองใบ  จารุเกษม</div>
+                                <div class="drug-name">
+                                    CEFTAzidime 1 G. INJ. &nbsp; <span class="drug-qty">#6</span>
+                                    &nbsp; <span class="drug-timecode">2g v 8hr</span>
+                                </div>
+                                <div class="drug-inst">14:00 น.</div>
+                                <div class="drug-location">LED iL2 5-1</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEZklEQVR4AdyZgW4jNwxE8/r//9zeW2a0XEmbOEiB1hvcmOTMSPbQDozg/vr7wT9/fTz4Z4QDPuBn6HuBOts5eygecLwAWJ7zYvgcYPXB15xHRziHp2EJ9+dX8OM79CVAbTBnosGVV4fioKpe+Q45AafHWXTfXa8vWMJFeEK9DQe1OTjrLnA2CKcPGO8+nHzO54wzlG7/KqDOwFl3Z2/D7czvxv1r4fq74RKgtmo/A0rLGSsUN3t/M/86HOxflC94Rl5o+My9wv6+7nm1/3W4V5/ov/Ddhst2e929wOhQG8/cvfC6tjvf77KPp1f5GbfhZuM7zks4qC3Dfe1BoXzZItQcD6xfC69o8fQKdTfc1+5fwnXx3fsRLpv/STV8/FDbzKwWQGmZv6pQ3n5P+p9Un2OEg7pUUsA5w9nPmnMHlBeqquVF2Qs4NTh7tXjhyqsFsGqwciNcDj6p3obrG5wDdw3WjXW/3j4f/efDToP1Plg5rwAst7gNd3vijYQRzi2K+bXLBdGA4y/ozNbZkxnKC+dXQtfSe0dH53uvp89Q94eDmvWNcA5PwwgHZ+I5JJQGVbMla7xw1eA633lz/q4CQwKWT0xEKM3nEfIjnMPTcBsOahNw/q4kPJxaOLcloLTwQNovq2c7gONdkoPq5wvUZq7PSzhYL4Ir56WiX5ReXvQZruejvVKBYfNeEQJOrXNQ/BIupifUl8K5LZHAwPjIyAsoLp5UOD/WUB79AojtuA8YVT0Yps8Gyqf+SW3LS+G2J9+AXMK5jRnJccdHv6tQm55174OrJifihfWd71r6XV3C7Uzvyo1wbkvsgkBtF65VLxRn3+FdM7puD1gOxAscv3cH+edBHlZOXvyxXP7JCckRzkHA9SJA+oCHOmDVDmN7gNPT6NHmvhCZgUtI9VkDpA/MmuQSTvIpGOGAY1PZwC4glAeqxmuF4nIOzhmq1yfgnHf+cN9V74oH6s7M1hHO4WkY4dyCgNoAVDWwvLAX9gJwvABYPgF6RYz2InOvcD0PdPnoPSscrDuojXAOHx/PehzhgMvGs40eNxyUd6eFg9XzivbVc0DdCVVzX69waiNcNzylH+GysTmY/I6TF3BuSp9chxzsPWpBzsDeG92aM1BeINT4H12JEQ44PpbwevUCn0xAnZMTULNaAMVBVX0BrNx3mvfGs6sj3E58d24J5za+wy50zuw0uH9Xdv6Zu7sb7v9i8I4lnORTcBsOattw1l1oOHU4+77t3ntHn6HOyO8ApcNZ4/MeKD4cnPNtuJjfuf46nNsTWYK9gHOD0XZVb8dXnlkDZmr/VbC4XiSA4yskdljnaAkBV486FBePnHCG0pw71GbA6f31O9ef7P/W34abN+K8e/HyO3Qv1DahatfmHsqTO4HZcvnoAccnB6p28224bnrXfgkHtQG4rz0sXH3RsnnrjgsPdX72QPH6ZsQL55d4PNGsSzjJp2CES/KfVJcw++VmxDPzztFS5cQ8y83Qs+PC/wMAAP//eQXVhQAAAAZJREFUAwDAu3beESq1OgAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">5 ต.ค. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 001748976 &nbsp; AN 69-15667 &nbsp; -</div>
+                                <div class="drug-patient">นางทองใบ  จารุเกษม</div>
+                                <div class="drug-name">
+                                    CEFTAzidime 1 G. INJ. &nbsp; <span class="drug-qty">#6</span>
+                                    &nbsp; <span class="drug-timecode">2g v 8hr</span>
+                                </div>
+                                <div class="drug-inst">06:00 น.</div>
+                                <div class="drug-location">LED iL2 5-1</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEY0lEQVR4AeSWgXIbOQxD8/r//3yXZwYStdbW9rg3c95mioAEIa3BOE5//XPhr19fF/4a4YAveA3uBeqM9bOAOgOMI8Dy/DH4LmCdweP++9jXCGdzNdyF+/4V/HqEvoR44fE2oTw54z1wr3XdOsi533G88l04xavgNBzURmHyLjTUfDdT61u2FzDPZK7+LKDOw+Td2dNwO/OnaW+Hy+bDxwUAR2n5nQZOPyXvDr4ovB0uz4N6kenDhoZ1Bmsfr6xfWL+LPxbu3RfyX5w/Def2jti9AKifQrzx9D51OB45WhjqPmdniLfzznsabmf+NO0uHNTm4JxfCQkMO3D78MjGgdPZGLQCuJ2Hc272v+S/X9nmK+yW4ofaptojwPTCrPu53KuW+hX23HhbwvoQWHvNAdQMiLT87fJFZGAN3N5OXVO3l4W1gPJCsVoAjzWYnhEuF1yJRzi3JxLOWkBtAiarBzB12Ne5c/BP4R0/5SA1EQHmnUfNXq+wFtbCeoSzuRpGOJgbglkb2E0IawE1t1YX1sJaWAf2HVDnYXK84fjte33sYd4Bs9Y3wtlcDSNctnPkHvg4A8Y4swi9B7aflnriP+PusRY7r3qHnhHO5mp4Khysm4fq3dTZQuCxp5/1LgF1Du65+60B6RRPhfOhIrdYC3tgecupdQDjD3zXn63zHP2wPqvPnAuYnqfCeegTMcJBJYbihOnbgZrBZOci/h3D9MNaxw+le1cHEMtg4PZuAYa2K0a43fDTtRGub8sauG3HgFC1ekefWQvYez3nvEMtiA51Pn3mnfss9Y5HuN3w07URDtaNJRiQ8vaTBAb3bULpw/xTQOnAjzIJptbvso4LGM+L5lwAkQarC4URTkEAt8ushSZZWAtrAdjeYC9uTfu209r49iyY9wBDA7p10aH+xMQALHP1Ec7mahjhoJIfA+42D+XtM5iaOlQPtWG1HfI8KH/633HuAYYt2hC+ixHuu77cvxEuycPAeA8ndWZhIKM7jkcGbnfFBGsfXdZ/hPoZ4oW6M73+Ec7m6+ta30c4qORQnJhuAkqDleOR9QnrR9Andj5YnwHc2YDlndANMGcjXDdcpR7h3OQOBt3p0aA2Beccr3cJKK91EE/4THfeZ7De5VzoGeGgTPA8e8ERXiyiW8N6p5qIR4byWB8B+xlwtC79CLeoF2nuwrnRR+jZj97MosP8I57Zq5y7jueid+6eu3B9+On1aTjg9nELk38XFsq388A6g9ln67tzalBemKwu4FxzfhrO4afjj4eD2mYWk5+MHK0zlN+56DNrtSPUhbrcoSbU3g4H9eK8THixgNJhsnqH/gCmD4i8/GoM8aeA+WEF3HnfDvfznP8lnYbrG069S5BZOJ7ep4babjw7jrfz0ZeZOtSdXVMXp+EcfjruwkFtAs65h4bVlxmUnl7OdmHOojkXUDOYHA+Upk9El2GdOb8Lp3gVjHCmfxUu4XhGTXTdviOznZZZ5/iipe+cWdjZvwAAAP//zLK3RwAAAAZJREFUAwAxsaDe9QUjtwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">5 ต.ค. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 001748976 &nbsp; AN 69-15667 &nbsp; -</div>
+                                <div class="drug-patient">นางทองใบ  จารุเกษม</div>
+                                <div class="drug-name">
+                                    PARACETAMOL TAB. 500 MG &nbsp; <span class="drug-qty">#1</span>
+                                    
+                                </div>
+                                <div class="drug-inst">PRN ใช้เมือมีอาการ</div>
+                                <div class="drug-location">LED iL8 5-1</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEeklEQVR4AdyYgXLbOBBD8/r//3yXpw1IiiJjZXJzU7lTZHcBkDLWadz2zz9v/OvPxxv/auGAD/gZVnuBuiMa1AyEahWuXETgeD3OUD3cr55r4RzeDZdwn38EP15hXALUNsPl7DzLQ3mhajx3q3e8wnjXJdwoPr3fhoPaLvS6CptNrjQ5uJ4fz0Dpeu8C6gz0ujq7DbcyP437z8NBbfO7RUB58g5aoTio+t35u9qvw8H6xUDxvvAgL2qew1u/09R/gl+H+8nD/m/vNlw2ONbVi4s+ayMP53dx9MJeG31jn7vHOurpt+FieHK9hIPaJOzrGBjKN3JjD7S/FMDZC3ttvCM91HnY13itl3CS74IWbvz+vdu7hHihtplZTThDac6vAOX1nNBv/Sk818JBXSopoM/Q+1lzfoW8sPig3we9V48XzrxaAFcNrlwLl4PvVFu4bGwOB8zU6QfELALt32Gz1uavxmd+tZeiJhRgfSegvEULt3U8WNiGc2szkhM43h116L1zAMV7BqqPlgr9o0CfgPLaB/GvZih/PFCz3m04xadjGw5qA8Al47ilWQTau6pP3SrsBXSP83cAmgwcdzdiaKA0nyOUtuEUn44WDir5HMgtwFmDPqsL6Nx8x53ZO0ZA3ScH1c/3qM3cOLdwIaEu8qCQtwq4alCcvhWgdGAlv+Sgn/M1iByCro0cFH8JF9M71BbOjYwYwwGnP8hQ887vWbh64MwBWg8AxzOg6t27j8ObLy3cRn803cJBbWxOAzRq3KZ9Ez4b5xWA9o582k6/9UPpEeREZugf9HD2ArEtawu3VB9OtnBuSwBt08ART14cw+cX4PB8tu03FAfnqsGzwn4E0EZ1AZzu3nHyol3w1cgJxxbOYQWNcH1g+JxxFrs5/Fw9I8LbCzg/U11eQGmA9AF5AbTlvAx3nHzolxYOKrHpxZjHWYSD7g03V+ge6L33QJ9zDorLfKd6V3xwPd/CxfROtYVzCwJqA/YCagZabnkhARzf41BVTqiLuV/NcgHUPZ4VQKT2HHmhYF1BrYVz+Ph4r68tHHBsJluA8yyf6FAa9A/YaPoElCf8WGGveVbA3gP3tBZufPi79C2c2xIJZi8yj1U+gNpi5tGXHsqTeeUNB2tvdGvugfICodr/zEm0cMDxbQn3qxf4MGEvoM7LCTmrgNKgqloAV+6V5p3xrGoLtxKfzl3CuY1XuBMa+jsBvb9zdvbk9cw89B9ocH3GJdx8wZPnbTioTUCvq6DQdeibjBeu3PhOQJ2Pf65QOvQaj/dA8eGgz9twMT+5/jqc2xPfLQH6NmefZ0fMuvOo28sJwHKCupD8dTjg+AjxQgHn2YcE6gLKE94KxakLOWEPpUFVeaE2A7rn1+F8yN+Kbbh5I86rEPIC+sb0Qc1qgfwrwPkccDky3gcc3zlQdTRvw42mp/aXcFAbgH0dw0L5xm2qZ4bSoddo+qB4exENis88Vn0C+sdMdPngEi7CO9QWLsl/Ul1A/PZiN4e36gucR8x85lX13MzLCfl/AQAA//+jyLYRAAAABklEQVQDAP0tat4MggxZAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">5 ต.ค. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 4</div>
+                                <div class="drug-hn">HN 001748976 &nbsp; AN 69-15667 &nbsp; -</div>
+                                <div class="drug-patient">นางทองใบ  จารุเกษม</div>
+                                <div class="drug-name">
+                                    VITAMIN D2 20K.IU &nbsp; <span class="drug-qty">#2</span>
+                                    &nbsp; <span class="drug-timecode">t2w อ</span>
+                                </div>
+                                
+                                <div class="drug-location">LED iL4 2-5</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEXElEQVR4AdyXgXIbOQxD+/r//3x3zwy0XK3kxL2kM+vMoKBAUF4wdjz9/c8b//z+9cY/IxzwC17Dai9wvWP2weeePgNXPzzXnB/hPLwbLuH++wj++gyrJUBtcjU7+1ceqHk4c59dzc1a91/C9ebd6204OG8QWGYFHp/VNKHOcPDcm8/A9t0Sb2c47oaqez/1NlwMd+YfD+dnIguyFv2cGuo3AMXR/w9/WzgfegWoh4Ur++CrGTUov54/xbeF+9MH+Mm5bTi3N+PZg0BtGoqfeXsPyg9n7p65np/L8+zxvA1n8+64hIPzBuF6XoV2e+IrPX0Cjq+AzKmLnDvD9VngrHX/JVxv3r0e4dzWq1iFzx3peYbarrWA4wxHba/P5Sy/Cu8Z4aBeRFFAnWHP+vKiUD61DjjeelCePtO91lAe6wBKgz3H23mE6+K71JdwUNtZBczGw3rg7IfzWU+QOT48OctQc9YiMyu2PwNqvvsv4Xrz7vUIl00kUM6d04PaEhBpcPxDeLEAHv/LgINzxXw3kNaSR7hl9+biJdxXthPPip/tA3j8VjKnF85aemE9vfYMxwxUrT7jEm423Pk8wsF5A3A+GxJKg4PVBZRm3eHWc7YWcPXCVctcGMrjHUJd7oDy2BvhYlCcATUQT1gfnHtqHVB9ODjzcHzBdw0Or3dBna0FHGeoGortByNchHfiEQ4qORRnkz0sVA+KV72uWXuP/BngemdmvKMjutz1Xtsb4Ty8G14K1zdj7TJkYb0CMGR9IoI1cPl6sG9PWM9QF+pQ83Bmey+Fc+BOGOHchFg9vLpID2pLalB1ejPrCeDsheOvZebizbkznOftxR9WC0Y4qMHZ5BmqB8VqAsg9g4HH22wIrXBGRLKG8kNxeuHuidYZ1nN6RjgP74ZPw8H1rQO1Lbc6L0RNQHnmfj/D/u744PB4r0hP9iyshbWw/jScprtiGw72m3czwtCysO5QE8CQgcfnEYrtp2ndEV2G8lsLqDPgcYsp3NZ3y8Y2XN8i8Nh4EsL5rB6/tYCvewBHTgBOr2kTzpqvCaVBsb5gGy6GO/MI5xbEKoz6CnqhNgbFaiJ+a6geFKcn2xdQPesOPTN6P3U8OcsjHNTl8HX2glwahpq3J9TlFeD4M58+nOfV4aqpC+8XUB4otjfCeXg3XMK5hc/QlwDHptQzC6UDyg/MPc/A4w+Hdcdj4OOf6B/Hp9S9l3BPJ2/W3IaD2igc/Eq2bLAz1F25B47PHFQPirsHSoPi9Drndbq2DddNd62/LRzst5rlZLud4TyXXmbkWetnqHko1h98W7hcGIZ6MTg4vTAcb8to4R4gWhjqzpx3/GPhdi/4N/VtuGyu8+rBet8aaqvWwhlZWAs4PHDU3aMvgLUHiGUw8PhqUdiGs3l3XMJBJYc999Bw9vWedf9tQHnVhP0AqpfzM3ZWrDzqwt4lnOK7YIQz7atwCbsZezPi7Xq0cO9ZR5c9d6jN6P1/AQAA//9KKOEMAAAABklEQVQDAGLEkd642i7yAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

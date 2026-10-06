@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายชานนท์  ภูผานี</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14690</span>
+                    <span>HN: 000047311</span>
+                </div>
+                <div class="header-name">นายชานนท์  ภูผานี</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD32-69-01062</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAACw0lEQVR4AeyZjW7jMAyD++393/kursCZuch22gIpzk5RjwolKtMPsq37+bPY6+ex2GvtgoEHfH5aSwPH3K1Y8XDUwOuc8q09YXVhZmxOeHt4P149o0Zl+SDW8x1tls+5LGez4Cx4Bm5YMMQEIMdREyDXQfDSQ1wDopoIdB+uTeHmGBa8xUz1vgu+epx6yFx133vCV3X6W/e5dMJaX8erC7+04KuLy+43LNinkdlZ0hEHx5+jnnuk99jM7ugfw4J74v/RdxesqcFx7aDPSfsKaiWh5s70UP1wzs7yrD1hdftTzDo74vyeHuv8J7Zyrj1hdWFm3E0Y6sNARUPl4JwtbUFfQwh94XXgyMlXEMIP57HoWmdXcCtoJn7tgn393pmq9FDXz/PI7yg/9DWKK+j6zC4x5cAx59oTLl159XiHITrqXJYPIg74/Sg4ixtxUPNAtXu6e8K97szg200Y6lpA2KMiIeKgridUDqqtXL7yEH75ziCExvO43cuxK7gXOIfvsf8A4GyXvHjXAM//CIz8EHFQt8I1bkPE+n3kh/DBHuXPcO0JZx2ZjWtO2FeoZ3tDsjio65b5XZ/Z0vR8ihFC3FPXBaVvFqyA2XDtgiFWAT5D34qyTjrQzquYgq6XDVUrzhGOfjhya0/YO1Y6/epxvWw4dlm+grpHsXtHcY69+JbvnnCrM7PwwwlDXUk42u80wtcSIqfngeCAXxp4/toKFX+dm+E5t8vnO+OGBT+VE325tGB1HOqUelzxQcQW+9/jc4CIg/4fJJcW7N/gt+y74G91vnVfrbH7IdbXOcUVdH5nbxf3hLcmTP0eTrisSO+MuuNaOK7iSJ/5lRMiH+xRGqi8uGHBCpwFmwVD7Q6cs7OmQNVqMllci4Oqh73tGuUuKL7YOuKaBStgNly7YI3/U/St8Fziz3Il3mN7dok9c5ab8F8AAAD//6+ZJSUAAAAGSURBVAMAWyBqxeY/ED8AAAAASUVORK5CYII=" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <span class="med-name">CYTISINICLINE TAB. 1.5 MG /t2+3</span>
+                        <span class="med-qty">#6</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                <div class="page drug-page">
+                    <div class="drug-body">
+                        <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 2</div>
+                        <div class="drug-hn">HN 000047311 &nbsp; AN 69-14690 &nbsp; -</div>
+                        <div class="drug-patient">นายชานนท์  ภูผานี</div>
+                        <div class="drug-name">CYTISINICLINE TAB. 1.5 MG &nbsp; <span class="drug-qty">#6</span></div>
+                        <div class="drug-timecode">t2+3</div>
+                        <div class="drug-inst">2T tidpc, กิน 2 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น</div>
+                        <div class="drug-location">LED (No location)</div>
+                        <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEb0lEQVR4AdyXi3YaQQxDc/P//5yuxmjG81oCh552tyfCtiwbZPKg3z83/vf9deN/1RzwBa9hdRfod2QNRM8cRA2Yqq+hEkcCVB5+lx9jX9WcirthMnf8CH49w+oIEBd1zzsAU3VvJY4k64Cl5pCVL2vPYhE+HiZzD/4WYWsOmL7PV44hdKueOF1ZMQNiRj1oueqs2+UQM9DiSrs1txJfjfuYOV09A86v+uxQEPPPdGf9j5nzk0C8KBsVD8Epz4DzXyBZ+07+cXPvvIi/NbM158vnePYioH93oK81C8GtdkL0IKI1mhvhXo6jRvXWnJpXx2QO4nKwjyvTvqJ7uc65+4qAQgdrgfKnKDchONjHrJ/M5ebV82rOF3slnpmHuK72QctzrXmInnIB+lqcZl6F5qo56JdC1LCPWuAnhdCJG7HTmD+L2gWxG/ZRuhHV3Ni4Q13N+XoQ1zkzZ600EHpzjuoJgEKBez8/P+XTP7ReERwPQPlFAhEPavuV90HoIaKGqjkVd8NTc/k6ziGuA+3jEwTnA1mraG6Mz3pnfe+C9fOq/9ScRFdFNQdxAV0rY2Us96GfG/VApYDp5wl6zruh8ebqokcC7TvnQXWhmuvYmxTVnK8DcTH7A5x2VwdKvZvzkPo5V21Au7y5UetacdSIg3gdygVodTWnhuAFECLVELn6gjgDojfWELz0EDn0MfeUr6C9EHNjXz1zyjPET+ZE3gXVHPTX8RWgfevYNIQWMFW+RaHVtbFIvDtHoOywHFptnXuO0F4bhB4iSlPNqbgbXjLnC57FswN5Dtp1oeV5NmvNw6yF4Kx31MxL5jRwJVRzdgxxCYiYzUBw0KL7EJz3mFc0B6ERJwAKBaMGKD+D4ovgeFCecVDlA7g4CD1EVK+ag0aqYeTBzIlXDTGnWhAnKBcAlQWqhVI8HlQLQDWj2pAMoqdcgKilgcjFj6jmxsYd6smcrpEBTD6B6coWQfQgona55yjOMPdOhPanYDU/mVuJrsptzUFcXsbGK4+1NBD6sQeoXQCUdxzmOM6VgeMB5nfHWkWIXYd0+hrMTf1LE2+Zg3YtaLkuAVHrqoZ4YVWLXwFij3oQOcxR/R3eMrdb9r/x1dzqqmeceisz4gWYrwzBeQ7mnyfoNdo1wvM5rjTVHMRS+H3Uci9VLkDMm1cUnyHOMA/9nHlFiJ7yDO3ItXJo2mpOjbthMqdrPEM+AsSlxpmscW4NxAy0aM0qeu7V3mRuteCq3NYctKtC5GcmITTQR8348hA9cYZ7juYdIWagRfdWMe/ZmlsNXo37mDlfbIw6CMTVx55qiJ50GeoJ4hQF5TvAvOdj5vykMD+Je6uoFy1AzEEfc0+5sNqz4j5ubvUk/4rbmtOFRqxepDXujbV5RejfFWi1+isAK3rLAeV/HhJszal5dUzmIJzDPmbTELrMKYfgoX1+HN9V1dIKygXlgvIR4kdAPI95z6iezIm8C6o5O34l6gjWK88wr5h55eKEMV/V4kZoVhCvmCHO+AMAAP//V9UC4gAAAAZJREFUAwDVQ5reP/GMHwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                    </div>
+                </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

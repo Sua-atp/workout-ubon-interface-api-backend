@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายอุทัย  เรือนเจริญ</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { display: block; font-weight: 700; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-13751</span>
+                    <span>HN: 000165470</span>
+                </div>
+                <div class="header-name">นายอุทัย  เรือนเจริญ</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD19-69-04458</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAC3UlEQVR4AeyZjVLcMAyE7+v7v3OL0Wy0Sew47sG12MdgVlmtlOiHMHP8+r3Y16/HYl9rFww84PnjSwOZz/m7NmQ8/L2t+609YXVhZmxO+OPl/Rg9vUbBeSV7MfKPPkvRK9axWbCLZrK7BcN5KpDcSDNK148HItdIHogYqONVrm7BV8E/0fcu+Kun5isM5xWUH9L31c/g+d4T9m7MaH/7hCFXVevrCOF/VXO/veBXFXL3Pt2CfRo1u3cjj4GYJiS6X/ZITsU4XsQ/ugVfBf9E37tgTQ1y7eCerVhHyFitnftlQ+rEOUL64Z7t8bLXnrAm8CyqmwU9V7lunZbO+Wds3XftCasLM+NuwpAvg1rRkH4Yt69yug8yt/OyIfy6LgjBQR2LppxdwYWY/axdsL8FIVbDJ+5+2TV/jSt68cXWEQdxP2D34SEEL10Lla+Filt7whDdhOwyJKcuOXpHIbTOuRbC79xdGyIW8tk8FtLv/NFee8LHbsx4vZuwryLEitQ4CB+w64m0TgLbP+jEQ3K1GOkcpSsoHs55Wn7F7AoWOS8+9h8AALem0eoiZDyEXbQ6tUZC6NwHwQFOn2zlLQhszw5hF15HwWtPWF2YGXcT1vhb6I1oaY48xHpB/v08asq1567ZkHkgbNeVHMcDoQM26a7gjZ3YWLtg4PSmg3FuZEEg8vs69uKldR1EHsDpk732hL0d6uIIevxdW/lb+pof+NzEVgyEX7EFpX1PWJ2YFbsThlgPqONIYyBy9GLKCupcaSHyAVUZ8Ln6wObvFrwpJzFeWnBtasA2BTjbV31WvjuoPC8tWDf9l/gu+Ku77+sGsbIj94CI8TyyPQ+EDur4qf348Z7wRxOm/u5OWOvTwpHuKAfk2olr5ZEfMqamla6g/MXWEdctWMJZsFkwZEfhnl1rCmRszf8MB+O5mwU/8yD/c+zaBesX/Fn0CXsu8T2u57/KU3yKL/bxLDfhPwAAAP//Vk2ZngAAAAZJREFUAwDr75TF64FD6wAAAABJRU5ErkJggg==" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL 2 MG TAB<span class="med-bin"> (iL8 1-1)</span><span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">DIAZEPAM INJ. 10 MG/2 ML<span class="med-bin"> (iL2 3-3)</span><span class="med-timecode">IV</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">HALOPERIDOL 10 MG<span class="med-bin"> (iL1 2-8)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">HALOPERIDOL 5 MG./ML.INJ.<span class="med-bin"> (iL2 2-5)</span><span class="med-timecode">IV</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRAZODONE 50 MG TAB<span class="med-bin"> (iL4 1-8)</span><span class="med-timecode">t0.5or1forins</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL 2 MG TAB<span class="med-bin"> (iL8 1-1)</span><span class="med-timecode">t1eps</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">VITAMIN B1 100 MG TAB<span class="med-bin"> (iL4 2-3)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">ยาริดสีดวงทวาร(ยาผสมเพชรสังฆาต สูตร1) 500 มก.<span class="med-timecode">t2+3</span></div>
+                        <span class="med-qty">#6</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                DIAZEPAM INJ. 10 MG/2 ML &nbsp; <span class="drug-qty">#1</span>
+                                &nbsp; <span class="drug-timecode">IV</span>
+                            </div>
+                            <div class="drug-inst">IV, นำยาไปให้แพทย์ฉีด, ................................<br>12:00</div>
+                            <div class="drug-location">LED (iL2 3-3)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEUElEQVR4AdyXi3LrNhBDc+7//3Pbow1IiiL9SKadWplBsA8sRazjxPnz142//nzd+KuZA77gPbgXOM9YE1B14wCqBsXWocerfKxBaeE5O9fMmdwNF3P/vAW/nmG1hMxAbTUaqBxo56Ynz3NzriZI7xFHK1/MWbwLtuagbxwqfmQazprVdh/Nv9ODehZ0Xs1vza3En1b7tbn5FcoCYL/VzACRL9+PrfnD4NfmgNOfkFx8ZChN7gg9h4rhzJnPzE/41+Z+8tD/amZrLpsbeXWpsW/8SAP16jzSrHpzzefMmDXmW3M2Px0Xc1DbhT2PpqF0qcE1Ty+crZsnhpqbczUBlAb2HK18MWfxLmjmsrF32CVED7XNVa5uB9jPeZZz8rtwrpmDeojFEVB1eMx5OJQuuWdB1YwFVK7G/BGASxs4/vzYgIrhzPaaOZO74WIOagMxutqutRnRzwz9v4HMfH2LoPe+S+2TCpzvYR/ONejz89nqL+Ys3gXNXJyHYxBI2BhoP/OtOAWw1+QZMpQOinOMvQDWPbVQPSjOjL1mzuRuaOagnD8ymK2E1cJ67hWN88GoT23maKCeaR6NsYDqWW/mTO6GrTmoDbiNmIaqQWf7AqpmLDKzYigtsGqfatA1wOW97rMEVM9YeEgzZ0FYHAG01P6MNFMHjgtAsfVooGrJZfvCWEBpoNhaoE4kBxIuuZlbdj+82MwBp43H17ip1KC05tBjc/XCeAf7YuzD+pxZN8486qlr5kzuhpfMuSEBtV1jAbR9AMcr3wqLwBmxaLWPXfYFXM+Dcw24HAW0e7xk7nLChxSaObc1IveH2gT0D6lQNTXjjDH0nn1A2gJomx5FniWsycJ4Bqzn1TVzUCIo9jChSBbGwjgwF3CeG/uJoTTqhXX5EYBL27kgzeRh682cyd3w1JybAI4fHbhyFqJOJA9bg5pLLQwk3J7vfBN9B8Ch/04Pgmvtqblj8kO/bc1BbQL6LxK3OAO6Dnr8yj7ms8wzZyySrxiud4O6g/rJnKX74Km5cXtQW4HO9sUrK1EnoOadgYqh2L6AyqGz+hErnTWh7qk5RZ+KZk63K4zGVn2ozc49qDrQjgAuv+V2cxma++bpQX/PjTXgSJs54HgwvM7HCd/f4DznJYJvyfbzIxDJkoHjbnPT81MzFsnlZs7kbriY0/0zrJaQmfRgve30w5mDvT6azKwYan7UXsytBj+1tjUHtQno/I7JbBDYjqkBjveTsZjFUH3oHA30mrMCqqZma87mp+NfMwe1QbeZJUHVxty+gOoZi2iMd4hm5Git/dpcDoP15XxINGFrO8D+HKjeOJszoXpQrObX5jzk/4qtuWxk5FdMQN9c9HCtvdKbNblL6uZjbB5Y35qz+em4mIPaMux5NA2lGzdmf86tBdBnUos+DKWxP9eg96BiKFYfXMylcQdu5rKdd9gFRG8s5nxVGzVjrDZY1VMLq00cthb8DQAA//9DNPUxAAAABklEQVQDAC1ToN5FrM9eAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                HALOPERIDOL 10 MG &nbsp; <span class="drug-qty">#1</span>
+                                &nbsp; <span class="drug-timecode">t1.1</span>
+                            </div>
+                            <div class="drug-inst">1T hs., กิน 1 เม็ดวันละ 1 ครั้ง, ก่อนนอน<br>23:00</div>
+                            <div class="drug-location">LED (iL1 2-8)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAETUlEQVR4AdyWCZLbSgxD5+X+d/7fEIMme7OllFMpaWpgcAFbAj1S8uu/B//8+nnwTzMH/MA11L3AftY6CE3NHY8MqYWI4TzrvGZOydMwmXs9gj+f8G4Jq1nr3XNeGfpvZaV17R3XMydztXn3eGsO+k0CS6/A8awum68i8Prsf4G3M1LDXgPRg2TNjNiaG4V3zL9mzs8B5DaB4/ndLUYzEHprVKtw/U/4a+bGi/sGIW4eGCXHn6Z1ZuCoQ/A0dKHw18xduIe/Jt2a8yYrv7sL6DcNfa5ZiNqZM63R3Aj3Ko8a5Vtzat4dkzmI7cKeV6a9RfdqXmP3xYDoAHA8a9ZC5Efz9wdEDfb8W3rQZO6oPuSjmfPGrnDdAcQ2PQ+ZQ8bqQ+Sah4hVF1QbofpV6IxmDuIiKgoQOexZuvGiEHrXIf6tUw7R09wnSC9IBzEHe5ZuRDM3Np6QfzTn7cms4gpA5Q7uA+0FYYF7Py68eFV7lS//QlyvDn40V8V3i5u53QZhfmYgtwQRQ88+D5h24p7YTeD4pne56tJX1JriEc3c2HhC3sxBv7m6Idj3qk7xu6VAnAMzj3M6S4D9X477wDh+5M3ckT3sYzIHdH/71a82JUBoILnqFEP0FBuarVC95ooh5iBYGkN9wTngsDHQ7r+Z01BFUy+CqnMMcajzOgbRg56lgb7m+coQGukrpHGuuEL1Zk7J09DMQWwHgt8ZhdBAsrcGUXO+Ose9yiudapAvFOUVkD2I60KwdM2ckqehmfMWbRByA+5B1JxX9tzI0rimWIA4B5KtWTGkDugkwPEC0bkVEjVzSp6GZg72G7BpbwZCC8nWrHiccy62XrHgHOJs1UZYI3YPQg/B6jVzSnaAGIBgHygeZ1QTILS1r7oA0YP5hWC9dIJyCL1iQXUD+p76xilzFt+NT5nzlmwO9tuyxjOAS43dE7fihQA4XiKQ3/xq/JS51eAdaltzkNuxEW26AnJzkHrI2LNiyDr0sc+VToDsuwdRU19QHfqa6sZgzuVn8NactmKMVmHe1k6ruucVCzV3bIb5bJhr0gOiLbbmthM3ajRz2qhw5t6lM4DjzeU5180QfUi2FvKZdW1kn1N51CivfcWqNXOQF4dzsQ7QQYLis5De8AzENZ1XhnVPZ1SdYkhtM6fG0zCZ0zY+oS4BclO17lhn1Vg5xAwkW7NizQhXe5O51QF3rW3NQW4VIn5nEnoNZK6tC5A1n6X6Cu5DzECyeyv2Weptzal5d3zNXN3YbinWVIb4RjwDkVujuuOR1TMg5pyLv2YO4nAI9o3oIhA1xSOsg9A4t045RA+C3fvEXzP36UL/or81p42NWN2gNe6NOcz/C4H4BiDZ85A1iNhnmq0VQ2gUC5D51pyEd8dkDsI57LmahtB5qxB51TiGvqcZ9xTvYI0Z8hzPuFfzyZxFT+Bmzo6vsBZgvWJhlasuuGeuNcVnUec9s6r9DwAA///I4wshAAAABklEQVQDAONvmt7b5pTmAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                HALOPERIDOL 5 MG./ML.INJ. &nbsp; <span class="drug-qty">#1</span>
+                                &nbsp; <span class="drug-timecode">IV</span>
+                            </div>
+                            <div class="drug-inst">IV, นำยาไปให้แพทย์ฉีด, ................................<br>17:00</div>
+                            <div class="drug-location">LED (iL2 2-5)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEaUlEQVR4AdyXC24bQQxD83r/O6fmEpzRzsc/uCi8RVhKFLU25SRF//xe+M+fnwv/aeGAH3gN9S7g3WjgHjqvZtFGBu9JB9fwPGuvhVNzNUzhbj+CP4+wOkJ2Mqt9avDl04vjB8/ArJmQuVj9I8gXTOEyuAJvw4EvCJ1XgaHPYa61A9ZzdXAPaLwEcPwOWA3BM+i88m3Drczfpn0sXD6VcA6RXgy+dJ3VWp4Rmb/DHwsH5zeeNwPWgUiNoWvA8W0IZ27mN4qPhXvjtf/5yjbc+O2h/t670VyIR/WI1WzUdn108fhc9dJHbMONxm/sp3Bw/p6Hub8XFOyPB0g5MfQZcPzM6VMQwH1dAmuw5+qfwtXht9ctnK71Kmp48DXzDHAvD7h+Zib/iOy9wnpGCwd+AxIFcA97lm98QWkVdQ5+Vp3v6uxpDt6DPcs3ooUbB1foH4bTBceg0gSYLzl6gVH6+f39nf7nMZleFIDjF1Jdexiumr+tbuH0SQhjAGCUjgsB0/VX+9PyRgCO52YM5166nl9RNdUjWrhxcIW+hQNfCsz3wuV6Kw/M+2Ate+AeaI/ILEJ66N8hwPHpglkecJ29yi1cFa9ST+F0jREJGx18LSCjxvE04VZEA47L36TjS/pRlL/AHjCXUfsZjwakbAy012jh9EJCXGAT9G+LzOQT1IN9qis0D6KnDwMZNc6sMtDecDPeCnludHyprpDYwqm5Glo4WF9HgcEzOPN4qepVPQK8H137qeE8q7p8QrQw9O8q8D6Y5Wnh1FwN23C6lKDAYkG1oFoAXwmQvARw/LwAbQ4cWhNuhZ4n3MrTlzSwH8zVANbkq5BnG07Db8cUDnwJMNeAuQx4pr7OVUsTVAu1Vi9IEwC1SwDt05W3oi5EB/vBLM8ULmYNBfXQF6JJVx2APWCOLpZXUC3A7JFeIb8gDc5+6QGcZ/IHU7gMrsDbcPUyY1Do14ovnrGPLs6ssnQB+jPV3wPYC/2fgpV/G25l/jbtqXC5NPhi6WvYaGBPZkDKxkD7ZREx++nBHuifDliLRztw1jITD+EkXQfbcDBfRJcSwDNguoTmwjRYCMDxCcLM1Q6eV001INpiG2678UWDFk7XFvLeVQfRwtHFwHH9zMJgfeWRJsgrrpBWUWep6zx1ZmHpLRz4zcDzrAfUh6kH76sWANEBYHmIY3jnL1jv6bXHNejeFm40XaGfwukaj1CDQ79U1fOMlQbekQdcg7n6U8snpK8sXaha6ilcBlfgbTjwJaHzK4HBe7pqAGcN+j/Q8YTzWuAd6JzZiuv+Ntxq8du0j4UDXzYHqBcEz6KB+3jFYA3M8WqWemTNAvBeevHHwuWF9dAR4yy9+Bkv+I2DedzZ9R8Lt3uB/6lvw+mqI1ZvNB7wVdNXL3gWDXoPvdYc3EPnPDMsXwD2rfptuJi/madw4EvAnmtgsC8azP1uJj2fxj2WrwL6a2Qv89pP4WK6ArdwSfwK6wA7v2bCbi5d83egXaHuqheq9hcAAP//66YdpQAAAAZJREFUAwA7h3PeEEvMLQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                TRAZODONE 50 MG TAB &nbsp; <span class="drug-qty">#1</span>
+                                &nbsp; <span class="drug-timecode">t0.5or1forins</span>
+                            </div>
+                            <div class="drug-inst">ครึ่งเม็ด หรือ 1เม็ด เวลานอนไม่หลับ<br>22:00</div>
+                            <div class="drug-location">LED (iL4 1-8)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEZ0lEQVR4AdyWgXLjOAxD+/b///muz1zItCwnzeV2duLOoCBBSDbYNtNf/9z469fXjb9GOOALXoN7gTpjLeDcq3dAeYAuH2pgex9FqBp+zp4b4WzuhlO47z/Br2dYLQFqqzkL1a+80fTC0QfHPl5Z/zPoC07hMrgDX4aD2iDsvAqcTa5mas5lAXWXmlCThbWwFtZXgLoHdl55L8OtzJ+mvR0OantuW6wWAOXJDKqHM8fjXSL9f+G3w/kCAo4vqiaAyw8oX1iPsBZQ91i/i7fDvfsCf/L8ZTi3OeMnL5Iz8drD8acBx16vvg61K3Rf6pX3MtzK/GnaKRzUVuGae0goXzYI1ccD+98c1CzeeGSombWAY981qBmcWV9wCpfBHXiEyzZf4b4AqC3mPFTfPa/UucczqV9hz41wcHwZqB7QtwHY/lOHnecHQs26DkcN9h6q3h7w/Q2O/bc0nmndAYwWGD5g00e4rbvZt6fh/AkA21asZ2QfUJ70YSDlzr8r2D9sru79bd0I2N4DihVhr+1zj/XTcJo+FS+Fg9oS7DwH75ubZ3OvF+queZYeSPmQvUt000vh+sFPqEc4U4tHL+18RvzR03eeZ3PfvcD2dxVNb+qwmkjfGfbzI1w33KUe4WBP3MPB/okWHXYvVA1r7huG8uQe2bmw7oDywv58fQJqtvJ3bYSLCHXQS4LMwtHh/ODMwkCOnRjYfgVh55zrZtjnsH5m/P38KVxMd+ARrieeg0FtLjoc++gr9l4ov7WA6vXbC2sBNVMTaoG9SN9ZXXRthOviXepTONOLHtBeRLMOoDadGZz7K69n4OiP19kMKC+cefban8Ip3gUjHJy3ASxzAtun3GqYzUN57GefWjDPVv3snft+Buq5aiNcDswM6DsgHtg/loFD4HgOB3/QwPGefiR3wnOP50Y4m7thhIPjNqB6twVVw5FdBpRm3QGlw859ntr7xaMe6o54OntWQHmgWM8IZ3M3jHCmFz8JqE+svLBvzvmVzxkgbdAntmb6pi4iWwezll4e4Wy+vu71/RQO2D71shnYPxETHcqTvnPOhYE+PtR6gO15UBwDVA/XrBdqbi28U1ifwineBadwphYJONf2HfFdcfem7t5Zg/VPIj4554GUSx7hgMOvBzzvlzc+EOF4p1YozZcWajOgPLOuP4DyQLHeEc7mbjiFyyYe8WoJ8cO+ufjgqMWbuQzlWc1WWs7IHd17CteNn15fhoPaJOy8CptNQfnSd2+0MJR35emaNZQXdlYX3icLa2EdXIaL4ZP57XBQG3VrYrUMKM88A4YEHD6tM/DOIFpnqHNdS/12uFwUhnoYFEeX4azlxcP6RHrAdgl4/N/T/x5u+RZ/SbwMl811Xr1j5quZGuybn732wPLXEUr3jkD/DCgfFMcrX4Zz+Ok4hYPaAFxzDw3li5bNzr06HL1AbIP1iSG0Ath+yk0apWc6HJzCKd4FI1xP/dPaJcRr3bHSoz3i3NE9s5Zejs96xr8AAAD//+feirkAAAAGSURBVAMAupBk3llELBAAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                TRIHEXYPHENIDYL 2 MG TAB &nbsp; <span class="drug-qty">#1</span>
+                                &nbsp; <span class="drug-timecode">t1eps</span>
+                            </div>
+                            <div class="drug-inst">t1.prn eps, กิน 1 เม็ดเวลาลิ้น/คอ แข็ง,<br>22:00</div>
+                            <div class="drug-location">LED (iL8 1-1)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEW0lEQVR4AdyYjVLbQBCD+fr+79xaVnS3vp8QWphO3EHVrlZ3sRYCDL9+3/jfr48b/2vhgA/4GupewGerNtZgD3QePenBHvXgGl5nnWvh1NwNU7jjLfjxGf51CfX+3AXXz0o8mYujPWP5gilcBnfgbTi4bhJY5gXO9+pyeIjgOdC+IqBrh2X5AfashuAZdF75tuFW5nfTvi1c3gfgbWYR0cXgmWpBHrCmWpBeIe1v8W3hdg8AtFEeGpi+lMcZzJ520YvFj4d78Tl+xLYNl01WfvYEcN00XHudBWv1ztSaV+x0eTKrLH3ENtxofMd+CgfeLux5FTRbzGzso1cGWguc78OcA/fNcBRgDfZ82NrHFK5NblC0cNnYV3iVP+fB25UHej324FnOaT4is6+w7mjhwC8iUQD3sGf58oKqBbB/1DULMhNHG1kzQTr4TtizfCNauHFwh76F05aEZ6E0r5AXrtvMHKynF8sv8JhB/31T+r8A/Hr1jhauinepp3Bw3YA2HoBn0DmLGD3pMxdHqyxdAN+pWoBrL62eU1011SOmcKPhnfspnDYiJBSQsrHmQhOOAvj0h/BhOz/AXuh8Dsp/ul+A/r6E7gfrYK0cbeUUrk1uUGzDaWuCMsJ1O9B7eSrkfxX1XGrw3WCud8UTDUjZGDi/giRM4cBDMOfCFesCsE+1AO7jr5rqCqC1wPlQOVcZPGvmRyHPo2x/wpAmSJ/CSbwLpnBKXQFMWYFzyxrEC9bGHpDtBHCei0d8Do7/VAtHOX1IF8YB+JuKZuC7wSzvFE7iXdDCQU+scOC+bkW6IC1QL3zWVw/4bphZvhFw9dU5eJbXD8vTwqm5G6Zw4E08Cwr2wMyrc9km2F89mYUzg+7NLByPOBrYD2bNpnASR+SC6GMvPRr4cjBL11xQPQLsA7N8QnyqYT2TB64z+YOXwsX8bjyF0zaEBAFSNgamb+lgrZkeBfCo1qTXEtbTtQqcrw/9R8HKOYVbmd5V24bTNgPom4K+Leh6vFnE2EuH7odrrXkF9HnuAmvxSYerlpl4CCfpPtiGg74RbagC5hl0TeuBay8td6gW0leG+RzMms4Doi224bYn3mjQwmV7efaxjy7OTAyc37mkr1A9YK80AWhHgOU98o1oh0qx8rRw4MvhddbduVR1xU4fPbXf1eBnGud6jVGD7m3hRtMd+imctvEZanDom5Kes3DVdzOYffJW5M6qpX42m8Ll0B14Gw68Uej8LHA2CPbHC/MP/epNPXI9D74TzJmtOPdotg2n4bvjx8LVDWZJ0WD/GQDP4tXZ1CNrFoDPpRd/WziYL9cL6IHAMzBLC+SpGHX14HNgrv5n9beFe/Yi/2u2DaeNjVg9ZDyZpQdvGcio/eEUaL+NQK9lBPfQOXeG5QvAvlW/DRfzO/MUDrwJ2HMNDPattlp9qxqY5NxTeTQB7TMfXzy1n8LFdAdu4ZL4K6wFxK+6InrlzKuWOrNXeHVmpf0BAAD//1o8xfgAAAAGSURBVAMAfh6L3pImjOgAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                VITAMIN B1 100 MG TAB &nbsp; <span class="drug-qty">#2</span>
+                                &nbsp; <span class="drug-timecode">t1</span>
+                            </div>
+                            <div class="drug-inst">กินครั้งละ 1 เม็ด หลังอาหารเช้า เย็น<br>23:00</div>
+                            <div class="drug-location">LED (iL4 2-3)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEXUlEQVR4AdyWUXbiSgxEubP/Pb+Xi1LdctsmMOFjcM5UJJVKMqUAZ/78d+GfP7cL/wxzwA1eQ78LbGd7LzmUJvWzEWoOno/uHuYsroadua+P4O0n9CNAXTMz6UHx1jBz6w4473WdeZ7xKKoLdubSuEI8NQd1UZjxyHCuCKVLnQiMsXCD+ErCAZvP/Ffr9B9stcCh9tTcofrDyLebA+5/gX6Hs78OMGTRDOINya/NAXcz64uDyed1RtMjlC6ad8Zfm3vni3n3rlNz/brJjx5+1us8PP/X6XNHz5OLpkf5FafmVuEn1jtzUFeG89iNQuk613Ng/KcAtlp43AP6qvtnG3gY+8DOXG9+ej7M9ffvs7nmo4W6qJyAqu3DzHutbgWUtvPOvArnhznYLoVZw8wdgm0td/bw3oPtnDNQnHmHc2eAmul92HPDXBdeJR/mcjWoC/S657D/EoCagRmPDpQ9t+8m8J3ddl8SXQvc+7fvn0e9b8k9DHP36mK/Ts3BvBZUnotB1f0W6XXOHEoLWO6wzq01zHfKOgxzZ+aA8Vc+Nbcu+sR6mINynAscxRjsvXCwnQ9/pE2vx+ig9vTeMznUXPY4M8xZXA0/mgN2noHxvu6X2gm/CODr99//cz8wnucmmLX9DvvBMBcBzEFF8kYB1ZMTUDVg+xBddyQANi/8SBMOSutOIQ/Fma8Y5tbGFeqXzHktAfNa1h05CpQG5lc5FBeNMbPmIjWca2Hfc3bFS+bW4X+9HuagrnF0OahezERjhG3vFU20PULtc7ewZxTmwjywPsMwdyb4ZH6YyyVgezlg+APu32xQ0UbmzDugNDA/c+mfzdhfezD32Bew5+RXDHNprMtTH0VnoB5k3hF955LDfgaKg4rRuic5bHvhjVA9qCi3Myd5FQxzMB1rDqoGLDcAxtszDShurb08VM9cRNOjfAfUDMy3dfp9Lnl6ifLDnMXVMMzFMdTFUmsYioOKvdfzrjUPVk34owj1jKNeuKN9UHNQUe0wZ3G7Xev3MAflOFeBqrUbLhGqZ21fmAtzYS7MV8gHULtWTa+hNLCNarJnjfaGOYurYZiL8xhMbQyXKCesYX/Nzq+59SO4V0RjvqL3oJ4frsdhDkoEz0cXrQ9ea5hf5bDfHb27BJTGPIA9l17mYa8Z5iK+UtyZyyUexWcOAHVJ90Dlj+agNOpF11qLzpkDhjvsC+D+HwzJnTnJq+DUHNQFYMYj0zD7MPOu9aIinLmwhpqxFnIdUH2YMX31MHkgrXs8NXfvfvivX5vzeh25R7jUP0VgfFbU9vme2wtgfhOH69pfm4PzF+UDAcMGwDDSX0wXwdR03jwzRiiduYCq1f3anEv+VZya8worjkxEc9QLB/Oa4YzOGoW5MP8JUPuAIQXGuyHkqbkIPjnuzEFdAM5jNwxbXXpQvLV/EWH+N4Da5Q6RHWveazU7c5JXwTCn61fhEdYZOdF5a9E5c7kz2F8RbXjrnq/1/wAAAP//OqWbEgAAAAZJREFUAwDNNnbeCq3lNAAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                        </div>
+                    </div>
+                    <div class="page drug-page">
+                        <div class="drug-body">
+                            <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึกมินิธัญญารักษ์ &nbsp; เตียง 8</div>
+                            <div class="drug-hn">HN 000165470 &nbsp; AN 69-13751 &nbsp; -</div>
+                            <div class="drug-patient">นายอุทัย  เรือนเจริญ</div>
+                            <div class="drug-name">
+                                ยาริดสีดวงทวาร(ยาผสมเพชรสังฆาต สูตร1) 500 มก. &nbsp; <span class="drug-qty">#6</span>
+                                &nbsp; <span class="drug-timecode">t2</span>
+                            </div>
+                            <div class="drug-inst">2T tidpc, กิน 2 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น<br>08:00</div>
+                            <div class="drug-location">LED (No location)</div>
+                            <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEYElEQVR4AdyXC3IbORBD/XL/O+/qTQscih9JtlNbq0kZRjca5AgtK3H+/HPhP3++LvynhQO+4HtwL/B4Rm0EPHqgen1w1qu+16C88Jo918LZXA1TuNtH8OsVVkvIGZi3Gn886eVoUOfGXk+Q2TOOV57CKV4F23BQm4ST3wmdrcabXoa6K7OfMtQ9cPLqrm24lfnTtF+H8x0RUFvMAtQElA5Mn2W9UHPrv41fh4PHFwfVQ7Ev2JDCWkDNYA4MNdMv9P8Uvw730wf/F+e24dzaiNULimc1e0eDeqeg+J0zeWbPq3PbcCvzp2lTOKgNwp77kFC+bDGzsVeH2Tv60kN5PRdAabDneOUpnOJV0MJlY99hlxA/1DbVejiH9Uwf1EyfgMdej/p34bkWDupSxR5QOjzn/ow1nH57kRdoLezlZwCmMXD8D8YBVA2P7KyFs7katuGgNrEK7MaDcR6953jgfmeEG8d3K4+v9DB74VGD+ZeA45L7t224+/yjaRsuG1ylg8cNrjzRgJTtd8sm3Arg+PxA8U06vvJ8GdYzjVAzKNYvnG3DOfx0tHCmFVAbgGIDqgtrYS3G2h7qHBTH52wF52I1GzV9Aua71QXUzLMtnM3V8DLcuA0XAOd2oGp9wrmwFtY7QJ2F82+90Qs0CTg+n024FT5DQM2sxW30NYVz0ENT0OvWQEaN1QVwvBCgzYBDa8Kt0Ctu5fEF5YHiQ7x/0yfu7XRX9PAULoMr8BQO5o0lKNQMit1iAKXFG10etfTP2HNCjyyse6y0fj6F64efXrdwUJt3GyLBgJTtH2HnAs5ZTMD0WdAr4gmrQfmhWE3A2UPVUJzzQMrGQHt+C9emFyq24eDcwJgX9rOVNxrUOSiOLvtuCWthLcbavgfMd2U+hYMye/GIHOp1ePTHE9YL5ek1dXtZWK8ATLL+IMP0YfUpnOJV8DIccHxAYeZ+CVDzbA6q1xMtrCagPLBnz+jtAeV/pb0M11/wafXLcG5uBzh/J4wnC0gPRGo/AU14UuT8E8txX3xh4NA9N4RTug624eDcAJy10eHsoWoodi6gejcKVasLqN6ZvbDuAeWBk/X10A/nHM6fJH3bcA4/HS2cW1jBgNGtRXrZXlgL6xHqYtTh3DQ8vgPxem5EZnCe7zXgaFs44Pggwvt83HD/Bo/n7vJxZ+pw/2KhzmW2Ylh7vCd+a5FebuFsroYpnOlfYbWEnMls7KOPHF94nNs/mzkXUO9u753CabwKtuGgNgEnPwsN5es3Fz/UbOyBSFsGjs8tnBwznFqeC6Xp2YZz+On4a+FWm8tyMgtHX/HoSb/iV+d/HS4PhfpxSL96cLSVB+o8FD/z5B45PqhzUOzs1+G85P+KbbhspOd3QkBtDoo9/+wclO8dj3eJeMfaPtCzDefw0zGFg9ok7LkPDeXrtbGG155sPAznmVGDcwZVQ3H/7ClcP/z0uoXLdr7Dhn/l7z3WPfqzvW6dmXUQLayeOqwW/AsAAP//HCQpEwAAAAZJREFUAwCEqoXeJykBaQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                        </div>
+                    </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

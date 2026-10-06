@@ -1,0 +1,5 @@
+
+> interface-api@1.0.0 start
+> node src/server.js
+
+API server listening on 0.0.0.0:5050

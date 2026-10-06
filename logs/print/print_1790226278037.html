@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - รวม (1 คน)</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14930</span>
+                    <span>HN: 000019603</span>
+                </div>
+                <div class="header-name">น.ส.วันดี  วะนา</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD4-69-013048</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAC0UlEQVR4Aeyai26sMAxE9/T//7nFaw0xwRAQFRIJ1XrHGT+CH3dXuu3P72A/P5/BfsYuGPjAdfnPpYHrzwPMjzT2hOc2dKxsTnj68P6claN9AuZ/Okdjzj6L+We5NwvOnHvgmgVDmQas9VYToMRkvlDs4HrmFzlwP8gx+tZ6s+A64Onnt+CnT7D1/O+EWx16uv3WCYN/qtp3ZC13NfLWgu8qau+eZsH1JOrzXvIjNlhPvRVXP0N93on/NAveC36i7S1YUwNfNTiOit1CrR6UnBmXxUOJgWN6lmfsCavbVzHrbORifvEZZ7bIX9Etl8nYE7YO9C6LCUP5MFDhUDg4pivWMK6hnU1gncf4TGDtC/tclkfcomCRPeNbsKYLvjZxJY/qylEjeM6atzO4DZaoO81HIm4L5Qcll7ixJ5x1TJ0xhNIxOK9bjlp0Z+TFGYLfE+3SwW2wRNkzHHvCWUd64xYThuVqwPJsK/YfEpsIfkfkop7dJ3tmM072DBcFZw59cZ/lfwBYd/YEmH8nBNt6bBIUv8hL1306n0EouaHoeznGnvBeZ3qxnZqw1q+FrebE+JZvZgdf35gn6rC2K8+pghX0ZBy7YPBVgGsYNyCuWuSlg9911A+Y/zJBOQzB8wB2/Aowf6t8ielt7AlPDZhfseNH9Tk4KFC6DGtduUNIqsrPEDxP6tgg3wk3GvR4c3PC4OsDOZ7pgK1jLeB5Yx5wDoj0SgfmD6WYV44Z1yxYwb3grQWDTyQ2T1MAt0H52jFb9N3TYR2f+d9acPYAd3NvwXd3/Oh9UFY2i7H1l2T2Lze9vROemtD1qzlhrckWtroT4+QL++spP0NwX9MlyqmzIbgfYMevAPP39JeY3poFTz5dvTYLhtIdOKZnnYESq8lEzGIiJ9/IgeeUzTDapRsvEbdZsBx6w7EL1vivYtyKmCvytd7yi3bpMYc4w8jX+nAT/gMAAP//Gv4V3wAAAAZJREFUAwBCW23F3MsZXAAAAABJRU5ErkJggg==" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CALCIUM CARBONATE 1250 MG<span class="med-bin"> (iL8 3-7)</span><span class="med-timecode">t1+1*</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">CARVEDILOL 12.5 MG TAB<span class="med-bin"> (iL8 4-1)</span><span class="med-timecode">t@/12</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">L-THYROXINE TAB. 0.1 MG<span class="med-bin"> (iL6 3-5)</span><span class="med-timecode">t@จ-ส</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">L-THYROXINE TAB. 0.1 MG<span class="med-bin"> (iL6 3-5)</span><span class="med-timecode">กิน 1 เม็ดก่อนอาหารเช้าวันอาทิตย์</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">SPIRONOLACTONE 25MG<span class="med-timecode">t2+1</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">SIMVASTATIN 20 MG<span class="med-bin"> (iL1 4-3)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">WARFARIN 2 MG. TAB. (ส้ม)<span class="med-bin"> (iL4 3-1)</span><span class="med-timecode">w1จส</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000019603 &nbsp; AN 69-14930 &nbsp; -</div>
+                                <div class="drug-patient">น.ส.วันดี  วะนา</div>
+                                <div class="drug-name">
+                                    SIMVASTATIN 20 MG &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1.1</span>
+                                </div>
+                                <div class="drug-inst">20:00 ก่อนนอน</div>
+                                <div class="drug-location">LED (iL1 4-3)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEY0lEQVR4AeSYC3LbOBBE/XL/O+/qcdIACAL6VFRbkdbl9ny6B1SPSNnJr3+++OvXzxd/NXPAD7yGcS+wnl1p0oM+M/dSG6Hr4LncuWbO4ttwMXd7BH8eYbWEzKy49Faa9KDekdSZGWO4e3HUX8yN5KfnW3NQm4QeV2ah+JnLdoGZas+2GuCozcVFvGhAzUCPC9nP1txK/Gm9t5mD2qLbF3+6CKjz/uSct5nTkJhfjD1Yv1CgfXit5pyd+6/UbzP3ykX/K+3WnFubce9FwfndgaqBNgacPjw8PyQUt6vTNzo3w/6MrblZ+In1xRzUBmEfV0azSai51GrH3DoAkj4VgeOdh30cD7qYG8lPz5u5bPeVOJqH2mbmodfQc3mo2nno+aq258yrcK6Zg/VFoPpwjR6Qi5rvEA3UGamNmTFfQR5qDvZR3Yxmbia+ob6Yg9rOuMXZaDgoLTBL2i9n6Fybu/WA48Nh1YPigMu5cyPz6QPHudYXcza/Bc3cbgNw/RMJ+nbuzUHNzsvKjDGcudjV6c8R6rVARc8Q6po5i2/D1pzuhYbhvBX74hEX3iigzoF99FwBXWMtPGOGfTH3rbfmJD8dzRzUpmZDbiUIB6W1P/eguPRHjbkYOesRM5faGJ25sDaOgH79Zk7hiHEgOdRgdFAfGNbRmI+AmoEewwMZOz6+odch1AIHn94YoTh1I9Q0cxbfhos5qE1AxZVh6Bz0XC2ca3s7uOlw5iI11DlwvTuiMTojoOsBqf/JfxABx33tFsRh/fYDuP08f8sLu8YV5GZEBxzXkofKoaI9Ea0RioOK8gFUT90I+cttafNb8NCc24DzdqDX8yKgOKjofADVywz052nWQNeGSxznxxxqBjjaW3M5CPoLOCZuP0YOaLfYjbp8A62XudZYJNEkKgFO1xg5+R225nYDn9R/yhzU5uAcs0FjTJuL1KsoH4SHOjv1vQjPaZ8yd+9CfzO3NQe1HTc8G7AngEYBD58LKA1co+eJduDvBK7P/G+q/Wt/NadmMmfre7A15zYE9M1ZC6jN31sDXDXOisyNeXqJ0Oehcqg4a4C0TnFr7qT60KKZc4ti9rHr2RfA8ayZi3neGkoDFe0J6HeFtYCzxjNnqAtmLrV8Mwd1KDwfPWA8zHqG/KpnX4SDuq49kb4RijN/BOjaZu7R0CfyF3Nu7RFGo9A3NfZXec6FmoEeV/r0Mpc60X7yVbyYW4k+tbc1B32rUPk9k3DWuFXhjFHAWTNy8sLeCKgZ6HHk59wzhP2tOclPx9vMuS0BteFxMVA9+RlQ3Kg3j27OrQMg6fHrCHot8TZzwHEBDxVwrne9mIDSwznKQ/XMhWcJcyjOesbbzM0H/w311pxbmbF6wdHMXPqw/ysEauvAPN5q2HOKch1zAbQ7aGtO4afjYg7KOezjaBpKt9ugfSjNOGcuZxTmwlyYizm3vgdnhJqLOZvfgmZOt6/CJWTGXKROXPVWnDoxcqmNI2aN3Kr3LwAAAP///rSYewAAAAZJREFUAwAXYoLeWCEeHAAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; ตึก อายุรกรรมหญิง &nbsp; เตียง 3</div>
+                                <div class="drug-hn">HN 000019603 &nbsp; AN 69-14930 &nbsp; -</div>
+                                <div class="drug-patient">น.ส.วันดี  วะนา</div>
+                                <div class="drug-name">
+                                    WARFARIN 2 MG. TAB. (ส้ม) &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">w1จส</span>
+                                </div>
+                                <div class="drug-inst">23:00 warfarin 1hs จ-ส 1เม็ด จ-ส</div>
+                                <div class="drug-location">LED (iL4 3-1)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEhklEQVR4AeyZCXLbVhBE+Xz/Oyd8GPZfAYqKnFTIskqNWbrnAz3iUi7/+uuDf37dPvinmQNu8D24F5hn7AmovnkAcw+qBiJpz9Aa9wRofXgtv4/dmjmLT8Nm7v4WvH2FV5aQM860UNs/4zIHuybcszieuZkbyXfPL81BbQ56PDO7bhG6HjhGgOM9s2oP8nGB0kDFaB/0FKA00OMkeBSX5h78W4cfm4Pa3rqFcfNjrg5qxr61MB8BpZH7p/ixuTwQnD8MVB96HGfy4FB86t8Rf2zudzzEv3XGpblsd4zPHiK6VZO+MRz0v5L9EdC56Nc46pOvGutLc5Lvjs0c1ObgOo6moXRjb8yBsTzys20D09fFIVwuUBq4juPIZm4k3z1v5rLN78Rn5qG263lQ+TO9OgGlNRfOGL8L55o5qENtCqgasDwAHC8d6DE3PQTDJX1g6FYKHOdYQeVQ0d4KOOeAJgWOM6GiRDNn8Wm4NJfNaxj6NqzDGa3PADWjZsVtGAg3tI4Uav4oHheoHlR8tI9wds6luWPizS+bOZi34kbi0VxA10DlUFFeZGaMUJr01MHcC5cIJN3+ndmIIfFMYWszZ/NTcGkOOD59zoy6GXHGQc3JCzVQPXNhX5gH1iJ14tiD/ZzoEqFrLs1F/M6xmXNDImbMRWoj1Fagor0Vzoj0ge29Al/Pe4aA1+ZhP7OZy8MkQhd7ExHOXKQ+i9DnoeejFhjLKQfa2wIqh4reW0wDj8K+sLw0J/nu2MzpeoQGYd4YVA2vvWRyHtScZwbhUsOuCXemveLsb+Zsfgq+ZQ5qq9mgMYuA4lLLBVBc6lEDxUHFaBLVJofSQEX7ULm6Fd8ytw7/3+vNHMybAJoHNyWA9kkW0r5IDaWB/r4Mp04AabUIbGc38pE4K2A/G/r8Zs4hASUyf5zZgj0BpYEem+iRjLpHqwW5oDWfJNFC3c8aKs+YPWG9mbP5KWjm4HoDMQulgYrZkLz5GWB/6ai/Qs4Ibw11v/QSgaTHSxloUaKZs/g0NHNuSLxiUJ1QaxRQW7MnYK7trQDWVquB469gw/MFVM88kBdrba+Zs7jdPuu6mYPaDvSYrSRCceMqnnGw6zMLMwfnNZCR4y8KvW7EPclz3NM//yfuEiaM2wHaJuH5JyPMWg/NWYn2RqQ/xvDw/H7tZQnzjeHrOjcx5uZQc6nlgrVnDaW/0tiHWWMvgOJgjvLNnMWnYTPnNr/C2RKgNhcOep3zwq11+kboc9bimX7lxnoz52GfgktzUBuEHs9Mj5uST51oL4B+FlS+6tYaSgc95jy1Yz7W9i/NSb47fmwOaqNXi3CbcK6Ryxxca9SdAWoGyDFT/LG56bR7ARzfe/f0+IX+XZQHPIj7Bbhf63flqnubzrq98AO0md9u7oX7/2eSS3PZ5BjPnir8ykFtUH7lxhpKB3M806QHpfXsAKoXjfHSnOS7YzMHtQG4jqNpKF02GG6soTRQMdwYM7fGUQPzvFqYe9HLbeZsfgqauTj+TnQJ0ZuLtR57Z5y8CLdGuSBcauNZz774GwAA//+h2k4sAAAABklEQVQDAPRVf94c3ZwvAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

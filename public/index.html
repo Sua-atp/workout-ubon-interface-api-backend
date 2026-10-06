@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interface API Guide</title>
+    <style>
+        :root {
+            --paper: #f3ecdf;
+            --panel: rgba(255, 249, 240, 0.9);
+            --panel-strong: #fffdf9;
+            --ink: #1f1711;
+            --muted: #665241;
+            --accent: #0b7285;
+            --accent-soft: rgba(11, 114, 133, 0.1);
+            --line: rgba(31, 23, 17, 0.12);
+            --shadow: 0 18px 50px rgba(43, 31, 20, 0.12);
+            --ok: #166534;
+            --warn: #9a3412;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            font-family: Cambria, Georgia, serif;
+            background:
+                radial-gradient(circle at top left, rgba(11, 114, 133, 0.18), transparent 26%),
+                radial-gradient(circle at right bottom, rgba(180, 83, 9, 0.16), transparent 24%),
+                linear-gradient(180deg, #f7f1e8 0%, #efe4d2 100%);
+        }
+
+        .page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 28px auto 48px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .hero,
+        .panel,
+        .endpoint {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            box-shadow: var(--shadow);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero {
+            padding: 28px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .eyebrow {
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(34px, 6vw, 58px);
+            line-height: 0.95;
+            font-weight: 600;
+        }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 22px;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .hero-actions,
+        .actions,
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        a.button,
+        button.button {
+            appearance: none;
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            text-decoration: none;
+            font: inherit;
+            cursor: pointer;
+            transition: transform 120ms ease, opacity 120ms ease;
+        }
+
+        .button.primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .button.secondary {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid rgba(11, 114, 133, 0.18);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .steps,
+        .endpoint-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .step,
+        .endpoint {
+            padding: 18px;
+        }
+
+        .endpoint {
+            display: grid;
+            gap: 12px;
+        }
+
+        .endpoint-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .method {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .get {
+            background: rgba(22, 101, 52, 0.12);
+            color: var(--ok);
+        }
+
+        .post {
+            background: rgba(11, 114, 133, 0.12);
+            color: var(--accent);
+        }
+
+        .put {
+            background: rgba(154, 52, 18, 0.12);
+            color: var(--warn);
+        }
+
+        .delete {
+            background: rgba(180, 35, 24, 0.12);
+            color: #b42318;
+        }
+
+        code,
+        pre {
+            font-family: Consolas, "Courier New", monospace;
+        }
+
+        .path {
+            font-size: 18px;
+            color: var(--ink);
+        }
+
+        pre {
+            margin: 0;
+            overflow: auto;
+            border-radius: 18px;
+            padding: 14px 16px;
+            background: #161311;
+            color: #f7f4ef;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .mini {
+            font-size: 13px;
+        }
+
+        .chips span {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(31, 23, 17, 0.06);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        a.button:hover,
+        button.button:hover {
+            transform: translateY(-1px);
+            opacity: 0.96;
+        }
+
+        @media (max-width: 960px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <section class="hero">
+            <p class="eyebrow">DB_Middle API</p>
+            <h1>API Guide และหน้าทดสอบ</h1>
+            <p>หน้านี้สรุปว่า API ปัจจุบันมีอะไรบ้าง, ใช้อย่างไร, ต้องส่งข้อมูลแบบไหน, และควรทดสอบลำดับไหน
+                ถ้าต้องการลองยิง request ทันทีให้เปิดหน้า tester หรือ import เข้า Postman.</p>
+            <div class="hero-actions">
+                <a class="button primary" href="/tools/tester.html">Open Web Tester</a>
+                <a class="button secondary" href="/tools/postman/Interface_api.postman_collection.json"
+                    download>Download Collection</a>
+                <a class="button secondary" href="/tools/postman/Interface_api.local.postman_environment.json"
+                    download>Download Environment</a>
+                <a class="button secondary" href="/tools/postman/Interface_api.server.postman_environment.json"
+                    download>Download Server Environment</a>
+            </div>
+            <div class="chips">
+                <span>Base URL: localhost หรือ IP ของ server ที่พอร์ต 5050</span>
+                <span>Database: DB_Middle</span>
+                <span>Resource หลัก: dbo.ms_users</span>
+            </div>
+        </section>
+
+        <section class="grid">
+            <section class="panel">
+                <h2>เรียกหน้าเว็บอย่างไร</h2>
+                <div class="steps">
+                    <div class="step">
+                        <h3>1. Start server</h3>
+                        <pre>npm start</pre>
+                    </div>
+                    <div class="step">
+                        <h3>2. เปิดหน้าเอกสารหรือหน้าทดสอบ</h3>
+                        <pre>http://localhost:5050/tools/
+http://192.168.19.249:5050/tools/</pre>
+                    </div>
+                    <div class="step">
+                        <h3>3. เลือก URL ให้ตรงกับที่เปิด</h3>
+                        <p>Web Tester ใช้ host เดียวกับหน้าที่เปิดโดยอัตโนมัติ ส่วน Postman ให้เลือก Local หรือ Server
+                            Environment</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>แนะนำลำดับการทดสอบ</h2>
+                <div class="steps">
+                    <div class="step">
+                        <h3>Health Check</h3>
+                        <p>เริ่มจาก `GET /health` เพื่อเช็กว่า API คุยกับ SQL Server ได้ก่อน</p>
+                    </div>
+                    <div class="step">
+                        <h3>Read</h3>
+                        <p>ใช้ `POST /api/users` และ `POST /api/users/:userID` เพื่อดูว่าข้อมูลอ่านออกปกติ</p>
+                    </div>
+                    <div class="step">
+                        <h3>Write</h3>
+                        <p>ค่อยทดสอบ `POST`, `PUT`, `DELETE` กับ userID ตัวอย่างที่ไม่ชนข้อมูลจริง</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="panel">
+            <h2>รายการ API ปัจจุบัน</h2>
+            <div class="endpoint-list">
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code class="path">/</code>
+                    </div>
+                    <p>ใช้ดูว่า API server ทำงานอยู่ และแสดงชื่อฐานข้อมูลที่ตั้งค่าไว้</p>
+                    <pre>{
+  "message": "SQL Server API is running",
+  "database": "DB_Middle"
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code class="path">/health</code>
+                    </div>
+                    <p>ใช้เช็กสถานะการเชื่อมต่อ SQL Server</p>
+                    <pre>{ "status": "ok" }</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method get">GET</span>
+                        <code class="path">/api/db-test</code>
+                    </div>
+                    <p>ใช้ยืนยันว่า query กับฐานข้อมูลได้จริง พร้อมเวลาจาก server</p>
+                    <pre>{
+  "success": true,
+  "data": {
+    "database_name": "DB_Middle",
+    "server_time": "2026-04-09T..."
+  }
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/users</code>
+                    </div>
+                    <p>ค้นหาข้อมูลผู้ใช้จาก `dbo.ms_users` โดยส่ง `username`, `password`, `userbarcode` ใน body
+                        หรือในไฟล์ JSON</p>
+                    <pre>{
+    "username": "1",
+    "password": "1",
+    "userbarcode": "1"
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/users/:userID</code>
+                    </div>
+                    <p>ดึงข้อมูลผู้ใช้รายคนตาม `userID`</p>
+                    <pre>ตัวอย่าง: POST /api/users/1</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/users/create</code>
+                    </div>
+                    <p>เพิ่มผู้ใช้ใหม่ ต้องส่ง JSON body ที่มี `userID` และ field อื่นตามต้องการ</p>
+                    <pre>{
+  "userID": "U001",
+  "fullname": "John Doe",
+  "positioncode": "DEV",
+  "userbarcode": "123456789",
+  "username": "jdoe",
+  "password": "secret",
+  "photo": null,
+  "adminid": "A001",
+  "pathphoto": null,
+  "wardcode": "W01",
+  "roomcode": "R01",
+  "firstname": "John",
+  "lastname": "Doe",
+  "departmentcode": "IT"
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/prescriptions</code>
+                    </div>
+                    <p>ค้นหา prescription จาก `dbo.prescription` โดยส่ง `prescriptionno`, `hn`, `an`, `orderitembarcode`
+                        ใน body หรือในไฟล์ JSON</p>
+                    <pre>{
+  "prescriptionno": "RX0001",
+  "hn": "123456",
+  "an": "654321",
+  "orderitembarcode": "ITEM001"
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/prescriptions/ward-summary</code>
+                    </div>
+                    <p>สรุปจำนวน order แยกตาม ward และวันที่สั่งยา โดยรับค่า where ผ่าน `startDate`, `endDate`,
+                        `wardcode`, `wardname` และ `genorderdatetimeIsNull`</p>
+                    <pre>{
+  "startDate": "2024-10-30 00:00:00",
+  "endDate": "2024-10-30 23:59:59",
+  "wardcode": "03",
+  "genorderdatetimeIsNull": true
+}</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method post">POST</span>
+                        <code class="path">/api/prescriptions/:prescriptionno</code>
+                    </div>
+                    <p>ดึง prescription ตามเลขใบยา โดยตอบกลับเป็นรายการทั้งหมดของ prescription นั้น</p>
+                    <pre>ตัวอย่าง: POST /api/prescriptions/RX0001</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method put">PUT</span>
+                        <code class="path">/api/users/:userID</code>
+                    </div>
+                    <p>แก้ไขข้อมูลผู้ใช้ตาม `userID` ใน path โดยส่งค่าที่ต้องการอัปเดตใน body</p>
+                    <pre>ตัวอย่าง: PUT /api/users/U001</pre>
+                </article>
+
+                <article class="endpoint">
+                    <div class="endpoint-head">
+                        <span class="method delete">DELETE</span>
+                        <code class="path">/api/users/:userID</code>
+                    </div>
+                    <p>ลบผู้ใช้ตาม `userID`</p>
+                    <pre>ตัวอย่าง: DELETE /api/users/U001</pre>
+                </article>
+            </div>
+        </section>
+
+        <section class="grid">
+            <section class="panel">
+                <h2>ใช้กับ Postman อย่างไร</h2>
+                <div class="steps">
+                    <div class="step">
+                        <h3>1. Import Collection</h3>
+                        <p>นำเข้าไฟล์ `Interface_api.postman_collection.json`</p>
+                    </div>
+                    <div class="step">
+                        <h3>2. Import Environment</h3>
+                        <p>นำเข้าไฟล์ `Interface_api.local.postman_environment.json` เพื่อแยกตัวแปร `baseUrl` และ
+                            `userID`</p>
+                    </div>
+                    <div class="step">
+                        <h3>3. เลือก Environment</h3>
+                        <p>เลือก environment ที่มุมขวาบนของ Postman แล้วค่อยกด request ที่ต้องการ</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>หมายเหตุการทดสอบ</h2>
+                <div class="steps">
+                    <div class="step">
+                        <p>ถ้า `POST` ล้มเหลว อาจเกิดจาก `userID` ซ้ำในฐานข้อมูล</p>
+                    </div>
+                    <div class="step">
+                        <p>ถ้า `PUT` หรือ `DELETE` ได้ 404 แปลว่าไม่พบ `userID` ที่ส่งเข้าไป</p>
+                    </div>
+                    <div class="step">
+                        <p>ถ้ารัน server บนพอร์ตอื่น ให้แก้ `baseUrl` ในหน้า tester หรือ Postman environment ให้ตรงกัน
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+
+</html>

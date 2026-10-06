@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายอภิรักษ์  ไฝขาว</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-15048</span>
+                    <span>HN: 000065645</span>
+                </div>
+                <div class="header-name">นายอภิรักษ์  ไฝขาว</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD32-69-01166</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAC30lEQVR4AeyYi26jUAxEc/r//7wbyxruAL5A86gSuFWtMeOxiR/Kqvvz72I/P7eL/Vy7YeAGz9sjRwPtvZ4PjYfHfdW89oY1hTNjd8P3L+/bb+2RQUGe6V7ubz9L6Kua3YYr8Rm43YYhNwA17g0B6jxIXvmxEZm4HkLmQo29vOB3Gw7RmWw0/M5tbp0stPN852cYG37ndD+h9p9uGPJsvfGtM3fdq/w/bfhVH/qZOrsNawM9fOTlXgty687t1XRt5W/k33Yb3kr+xthoWFuDPDU4jsrtoc4PWs2Kq/Kh5cAxv6pz7Q1r2s9iNVnnvL74iouY88/4USvs2huOCZzdZhuG9mWgxqFxcMxXbqCfIfTzQ1sZ9HOgjlV1xM0aFnlmHA1ru5Dn4ifpvnTOyYfMBSTbRWD6P3EXq2bFKbZEaWFdc2xY09HU9LzEKg45UcUCPS+ew/Y4j2/5kO+DOW7ljA1vTecMse6GIc/Em4TkgIkGpi+bONewKXh3oMXvj6tfyPgqsEFA5sS7KttIvdrfw7f9hoHVBmOqkLxPE9acxys/aoVVseAga4ZGFnwYZAzmGLGedU+6l/Dt/LUb1sn00Lfb0wTvOvchTy80Mo9X/pZOsSVC/z3X3nA14bNxsw1DngI8hz6k5bnFs8ch3xW8zOPyIXWAqBkC078mCsCamzUs4Zmx27Cm/RusBgXrKUPjVN9zocUhfekcPeeo3234aIFv042GlxuDPCmocanfeoas4RpYc3628iF10NDrSBcoPnyZuLFhTeIdqGlXCG1zsParHP+M0HKk9bj8sWFN4qz4kRvWSTr6AiDP17me1jW3+8NHNnz/XG/7HQ0vR+unUvlL/fLZc5ax3jPkyQKlRDWB6Q8GaL6SYM2NDVfTgTYp6PvKdYS+HnDp5GuDgUC5RWDShxNaWTyH6TkwnsPGhmMKZ7bZhmP1rzAf2F49aV0nLtD5LT+0R2zW8JGEb9f8BwAA//8lMdabAAAABklEQVQDADoHfMVEP2XrAAAAAElFTkSuQmCC" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CLOZAPINE 100 MG TAB<span class="med-bin"> (iL7 1-1)</span><span class="med-timecode">t1+1*</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">CLOZAPINE 25 MG<span class="med-bin"> (iL7 1-2)</span><span class="med-timecode">t2.1</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">P16 MG TAB<span class="med-bin"> (iL5 1-8)</span><span class="med-timecode">t2+1*</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">PROPRANOLOL  10 MG<span class="med-bin"> (iL5 3-4)</span><span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL 2 MG TAB<span class="med-bin"> (iL8 1-1)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">HALO-D 50 MG/ML<span class="med-bin"> (iL2 2-3)</span><span class="med-timecode">75mg q 2week</span></div>
+                        <span class="med-qty">#0</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL *5* MG TAB<span class="med-bin"> (iL8 1-2)</span><span class="med-timecode">t1eps</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">28 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง S34</div>
+                                <div class="drug-hn">HN 000065645 &nbsp; AN 69-15048 &nbsp; -</div>
+                                <div class="drug-patient">นายอภิรักษ์  ไฝขาว</div>
+                                <div class="drug-name">
+                                    HALO-D 50 MG/ML &nbsp; <span class="drug-qty">#0</span>
+                                    &nbsp; <span class="drug-timecode">75mg q 2week</span>
+                                </div>
+                                
+                                <div class="drug-location">LED iL2 2-3</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEW0lEQVR4AdyXC3IbMQxD83r/O6eBWFDUz7HrZqa7mSLgB9QK3DqZ/Pq88devjxt/pTngA16D9gIxo7gCog4rV90phphTHyKG51lzaU7J3bCY+/oIfnyHugRrYdyq6zuG0NZzYKx5rmpce8RVv5irzavHR3MQm4TOO7MQffe8VeePGMi254Dhs5+CEsCoAUq3h0dzXXLd6G1z3vi8AqC9AdUhYgiuMxA1CK49zb6Dt8354b4UnC+505zmXX+H/5m5dy7xU7NHc95y5d0lIN4UBFtvLZC/WlyrPOudm6vWsXuV3at8NFdFV40XcxBvAM68M+stQsztNBC9qrUOonfKVYfQwJmlMxZzbtyB05y3+QprAdYrroDYbq3NWuUQOsWC9YoF5eJXobk0B/EQFQUYc9UMiB7gUvudBj2vlwGyD2OcB0wBhK6W4fsadE2aq4fcJU5z3jR05zIJiAZYqyLQ3opiofaUA6IG9z4/P9uvBxVdUywAw3kQOaD2gnm+CtJcLd4lXszNm1AObLe5WwKEFoI1bzzSuzdrnVeGOBvwWLsf9FyNxZyKd0GaA5r7nTFvDULjXGy9YsG5GWIGcOmvGWh31HOEepDyCvXSnJK7YTEHsZ1qFMYa9Nzbqvoaq19zxRDzj3rSCRBaQGkDkG+wFb6+QdS+wvyX5vSgHYAUO7BOOdAepFioPeWw/lVgDSDJAPfMtemaWT1geL5qRppz4U6c5iA2ACPLrDdlhq5R/ztA1wNbOdDeAARX0e65QJVs4zS37V68mOa8HfupOdC2uuu5BqGB4DpfY+tntsbsvnLHZtUEwKUtp7lt9+LFxZw2IgD5tpQL9grnnjWVoetVhzFX7RFgr6932s0v5mB/kIYhejpU2NVUF9Q7QX1BfbEAcbZqFUBNj7HOEIB8KYu54/QFG2kOumP50BYMiN4ul7YCQuuaZyq7J4ZRD5FD8G4Ooqd5A6JmveppTsndkObs2AyxiZ3hqnFs3ZxDnANYsmXPzbwVb4qeA06fuc3UhUv55iAcQ3DdhP1B9CBYdeixcgOirnNcM8P3PQgNdPZ8ZZ0vQOgUC9KkOSV3Q5qT2wobrbVdbJ0Z1g16zprK7kHM1Z5i9yurLkDMAEoXpDmgfRDhea6nQczVmmOIHgT7ohA5YOmWgXa3XdNnmasmzdXiXeLFnDfwiKv5kw5i27D+JV7n59jn1fqupr7qYgH68wCVPhZzrXqTb0dzQPt/Dp2f8Qyh11YFzUDUFAvQc2kqoPeqFqIOqNwA5B19Rmv8+XY096d/afoxcxBb1Uaf2RB0vWZehZ/hOeVvm4O4lA4T6uHKYf2BUjUwzmvmWUDMwso6421zOuR/xdGct1t5Z8J99yC26LzyrFXuvmIBYh6C1YceKzekn+Ge+GhOzatjMQexJThzNQ2jzpvcaWrtFM/zQEqB/NEPEbsJY676Yk7FuyDNeWOvsJYw61UT5rpy1WeoLpzq6j2C52aN6r8BAAD//40JF1kAAAAGSURBVAMA+ImR3hJlMaEAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">28 ก.ย. 2569 &nbsp; ตึก จิตเวชและสารเสพติด &nbsp; เตียง S34</div>
+                                <div class="drug-hn">HN 000065645 &nbsp; AN 69-15048 &nbsp; -</div>
+                                <div class="drug-patient">นายอภิรักษ์  ไฝขาว</div>
+                                <div class="drug-name">
+                                    TRIHEXYPHENIDYL *5* MG TAB &nbsp; <span class="drug-qty">#1</span>
+                                    
+                                </div>
+                                <div class="drug-inst">t1eps</div>
+                                <div class="drug-location">LED iL8 1-2</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEhklEQVR4AdyWi3bcOAxDc/v//7zbawYSLdl5NGf3dJxThCQAaQzOJM2vfx789evtwV8jHPAG38PVXqDu6BoUB1WjAWlHBU7PoQBnDj6fPTfCOTwNW7jfP4Jvn6EvAc5b7Fr63JcZ6ow8VA9V41ETma3On0FfsIWL8IR6Gw5qkzDrVeBsMto6y0PdYS/iARwPhEsFjp+9Q1y+QWkw62I5xttwh/ri3/7zcMC2ImC8K+s7BVPbDn6T+HE4OD8MnOc8vHV9ts7Zd6zeP5l/HO5PXvT/OnMbrm8x/dVDRUuNB+odhFnjSYWprefiCd9rtF67nv42XAyvXLdwMLcJ130PDOXpnH222nvYvfFBaevs+QDKA/c1XusWTvIpGOGyse9UlxC/vcgMtV1nqF5dQM1qzsJewNScu+b8VXhuhIO6VFLAnGH2q+Ys4OzJQwDjb1V9omvOV4Dzfd0DuwY7N8L1w0/pR7i+Tdi3bWCo7axemH4oj36h13pCG6D8UFW/aJbjrxlgUOoCJhcROPzOI5zD0zDCwUxsSKgZ5rsiL6A0ezcoYHLyMGeoXp+AmvU5d8DU1GG+PpQGVT2nR9gL+2CEC/GkehvOLQQJnDlVHmqL9iJaaufsO/T0+bNef0f3Qz1HdLXbcIqvjm+Fg9oOVDV835QzlAZV5VasZ7q+as5wvgtqBsZRfWIQv5sRTkH85k7/gONXKzB4fcEgl6brwHFHLFAzEGpU4PD28xFh16C4eHod4Tr5lH4Lt27MeQ0Lc1sw+9WX2TsEfN2bs716h4DP7/HcFk7yKRjh4LwNmLPbugLM/2CjZzFQ52HWaKmeSQ/TB4Q+fv7G8N54LninLssId6m+OHkbLpuBucVkBY6N6gm3VjUhbxX2wl5A3QPzE6D+VQAfWkc4X0wAx4ND1X4aitMnoGZg2OQFcNwzhNbArsHOecS7rJ8B6jxU1T/COTwNIxxUYjclEtQezhrUrEdd2AuYmrMaFGcv5ANnsc5QZ2D/yEJpOWP1jg65Ec7haRjhkhpqK31On/DrLA/nc93Te71XiAfO91x5rzioc1BVzwjn8Pb2rO8jHFTidYNXcWF6YfaejR+KB0KNqi8Y5HsTHhi/baF6qPpuPUr8a1Uc4RyehhEuyRMwszVcqpzIbIXaKlSVC+DMQc1ALMe7BHOO4Ous6BpwnA3X6wgHZYKvVy/66IVXDepuz30HcH8urwG7Z4T7zou9incLl018VK/CQW0u57oHSuvc2ucc7N5o6xlgUPEA42O6hRvuBzS34aA2ALNe5YXSs7nVA/ufT90LdT7nuiYHpcOs8kIvTB6QHrgNNxwv3Pw4nNsTwPFZh6rZSdfCwdkT3gqleU7IWYW9sBfw8afix+FgfxgfoMMH6bjSOvfV3jvh/PpQs3f8OJyX/K24DedWVlyFiCdaZpgbjAY7Fy316jxcn4P5sYTdcxsuL/bKdQsHtQG4rz0wlK9zaw/lybvSK5QG55o79PbeGcprv2qZrVs4yadghHML34VLyBn7js73vnvso93V7rEX8dqv6Nq/AAAA///7jj+LAAAABklEQVQDADbioN4GKIvnAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>

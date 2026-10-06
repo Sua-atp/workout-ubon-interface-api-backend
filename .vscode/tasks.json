@@ -1,0 +1,92 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start API server",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"start"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "SSH deployment login",
+			"type": "shell",
+			"command": "ssh",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"serverrobot@192.168.19.249"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Back up remote API route",
+			"type": "shell",
+			"command": "ssh",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"serverrobot@192.168.19.249",
+				"test -f /home/serverrobot/Interface_api/src/routes/packagemaster.js && cp -p /home/serverrobot/Interface_api/src/routes/packagemaster.js /home/serverrobot/Interface_api/src/routes/packagemaster.js.backup-20261006-0955 && echo BACKUP_OK"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Upload updated API route",
+			"type": "shell",
+			"command": "scp",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"e:\\ตระการพืชผล\\program\\Interface_api\\src\\routes\\packagemaster.js",
+				"serverrobot@192.168.19.249:/home/serverrobot/Interface_api/src/routes/packagemaster.js.pending"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify remote API deployment",
+			"type": "shell",
+			"command": "ssh",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"serverrobot@192.168.19.249",
+				"cd /home/serverrobot/Interface_api && node --check < src/routes/packagemaster.js.pending && echo SYNTAX_OK && sha256sum src/routes/packagemaster.js.pending; command -v pm2; pm2 list; ps -eo pid,args | grep -E '[n]ode|[P]M2'; systemctl list-units --type=service --all --no-pager | grep -Ei 'interface|medauto|pm2|node'; ss -ltnp 'sport = :5050'"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify remote API file and process",
+			"type": "shell",
+			"command": "ssh",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"serverrobot@192.168.19.249",
+				"cd /home/serverrobot/Interface_api && node --check < src/routes/packagemaster.js.pending && echo SYNTAX_OK && sha256sum src/routes/packagemaster.js.pending; command -v pm2; pm2 list; ps -eo pid,args | grep -e node -e PM2; systemctl list-units --type=service --all --no-pager | grep -i -e interface -e medauto -e pm2 -e node; ss -ltnp | grep :5050"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Deploy and restart production API",
+			"type": "shell",
+			"command": "ssh",
+			"args": [
+				"-o",
+				"StrictHostKeyChecking=yes",
+				"serverrobot@192.168.19.249",
+				"test -f /var/www/interface-api/src/routes/packagemaster.js && test -w /var/www/interface-api/src/routes && sha256sum /home/serverrobot/Interface_api/src/routes/packagemaster.js.pending | grep -q 9a67c44ea487551af4a94aa6caef434d9497eac7c79995b13ad42a3bd4432ff5 && node --check < /home/serverrobot/Interface_api/src/routes/packagemaster.js.pending && cp -p /var/www/interface-api/src/routes/packagemaster.js /var/www/interface-api/src/routes/packagemaster.js.backup-20261006-1004 && cp /home/serverrobot/Interface_api/src/routes/packagemaster.js.pending /var/www/interface-api/src/routes/packagemaster.js.pending && node --check < /var/www/interface-api/src/routes/packagemaster.js.pending && mv /var/www/interface-api/src/routes/packagemaster.js.pending /var/www/interface-api/src/routes/packagemaster.js && pm2 restart interface-api && sleep 3 && curl --fail --silent --show-error --max-time 10 http://127.0.0.1:5050/health && echo && sha256sum /var/www/interface-api/src/routes/packagemaster.js && pm2 describe interface-api"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

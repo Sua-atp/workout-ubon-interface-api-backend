@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ใบจัดยา - นายบัญหา  ไหลหลั่ง</title>
+    <style>
+        @page {
+            size: 80mm 70mm landscape;
+            margin: 0;
+        }
+        /* ใบสรุป: ถ้าเนื้อหาล้นต่อเป็นแผ่นที่ 2 ขึ้นไป ให้ขยับลง 1cm (ไม่กระทบสติกเกอร์ยาหน้าอื่นๆ) */
+        @page summary {
+            size: 80mm 70mm landscape;
+            margin: 10mm 0 0 0;
+        }
+        @page summary:first {
+            margin-top: 0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Sarabun', 'TH Sarabun New', 'Tahoma', sans-serif;
+            color: #000;
+            width: 80mm;
+            line-height: 1.3;
+        }
+        .page {
+            width: 80mm;
+            height: 70mm;
+            overflow: hidden;
+            position: relative;
+        }
+        /* ── Summary page (first page: all drugs overview) ── */
+        .summary-page {
+            page: summary;
+            padding: 3mm 4mm;
+            display: block;
+            height: auto;
+            min-height: 70mm;
+            overflow: visible;
+        }
+        .summary-qrcode {
+            width: 14mm;
+            height: 14mm;
+            flex-shrink: 0;
+        }
+        .summary-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Drug sticker pages ── */
+        .drug-page {
+            page-break-before: always;
+            break-before: page;
+            display: flex;
+            flex-direction: column;
+        }
+        .drug-header {
+            background: #f5c400;
+            padding: 2.5mm 4mm;
+            border-bottom: 1.5px solid #000;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .drug-hospital {
+            font-size: 8pt;
+            font-weight: 800;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+        .drug-body {
+            padding: 11mm 4mm 16mm 4mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1mm;
+            position: relative;
+            overflow: hidden;
+        }
+        .drug-meta {
+            font-size: 9pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-hn {
+            font-size: 9pt;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-top: 1.5mm;
+            word-break: break-word;
+        }
+        .drug-patient {
+            font-size: 14pt;
+            font-weight: 800;
+            line-height: 1.15;
+            border-bottom: 1.5px dashed #000;
+            padding-bottom: 1.5mm;
+            margin-bottom: 0.5mm;
+            word-break: break-word;
+        }
+        .drug-name {
+            font-size: 10pt;
+            font-weight: 800;
+            word-break: break-word;
+            line-height: 1.15;
+        }
+        .drug-qty {
+            font-weight: 800;
+        }
+        .drug-timecode {
+            font-size: 11pt;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+        .drug-inst {
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+        .drug-location {
+            position: absolute;
+            bottom: 4mm;
+            left: 4mm;
+            font-size: 10pt;
+            font-weight: 800;
+            border: 1.5px solid #000;
+            border-radius: 4px;
+            padding: 1px 6px;
+            background: #fff;
+        }
+        .drug-qrcode {
+            position: absolute;
+            bottom: 4mm;
+            right: 3mm;
+            width: 11mm;
+            height: 11mm;
+            border: none;
+            padding: 0;
+            background: #fff;
+        }
+        .drug-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        /* ── Summary page styles ── */
+        .header {
+            border-bottom: 1.5px dashed #000;
+            padding-top: 7mm;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            break-inside: avoid;
+        }
+        .header-top {
+            font-size: 9pt;
+            font-weight: 700;
+            display: flex;
+            gap: 10px;
+        }
+        .header-name {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .location-section { margin-bottom: 5px; }
+        .location-title {
+            font-weight: 800;
+            font-size: 8pt;
+            background: #000;
+            color: #fff;
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 2px;
+            margin-bottom: 3px;
+            break-inside: avoid;
+            break-after: avoid;
+        }
+        .med-item {
+            font-size: 8pt;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5px;
+            break-inside: avoid;
+        }
+        .med-name { font-weight: 600; flex: 1; padding-right: 5px; word-break: break-word; }
+        .med-bin  { font-weight: 500; color: #b45309; }
+        .med-timecode { font-weight: 700; margin-left: 4px; }
+        .med-qty  { font-weight: 800; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="page summary-page">
+        <div class="header">
+            <div style="flex: 1; padding-right: 4px;">
+                <div class="header-top">
+                    <span>AN: 69-14906</span>
+                    <span>HN: 000096274</span>
+                </div>
+                <div class="header-name">นายบัญหา  ไหลหลั่ง</div>
+                <div style="font-size: 8pt; font-weight: 700; margin-top: 2px;">Rx: WARD19-69-04470</div>
+            </div>
+            <div class="summary-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAADBUlEQVR4AeyYC5LiMAxEeXP/O+9Go2pLsZ04A8vUYoeKUKf1MfoQqvj6s9jr67HYa+2CgQe8LkdLA8e5n4mB43ywtyn/2hNWF2bWhxPeHt6Pn0qvURCrJXvOK26kc8xV3Mt5WHDPeQZuWDDEhKDFoyb0pgGRR/ZRnmyHiIcWZ98aDwuuAz79/i74NyaoNTYNvpK/ca6dcU/YujCzvH3C4CsLfW1rbQJhf2fD317wOz/8M7mHBVv3z2R0aC92FDOy93Jm7iT+MSz4LPgTbXfBmhrEQwSuYcVmDRGb+Z9iiDxwDffOWHvC+Yv/Cs6dzXnAJ5Pt0HLZnuNfwcq59oTVhZn1bsLg6wWUmoHyx14hNwDOb7Bc0HLFuIHeSm7095Vt38TJG5yfA8f2XcEnZ0xjugvWKMHXYrRq4H5A+dNPOWoN4QuOlT/7gtuAQgPlq6UYCA4CKwhabu0Jq3Om1aWsITpmPrVA2KHFypXjxEH4Zzs43+MUW+vsKyyftSesLsysdxMGXx/oP4C0HqbVFGhjzC6R30jL3zRETsVBy8lWawhfcCyfXcEi59WP8R8AQPk5gBbn5oDbM2cTqwXcDyiuQDkn+xeHBGRP1A7KnrUc7gmrE7Pq3YR7K5C5qzg3C2JVwXHOA8ccxMOzF5PPuYp3BV8N+mS/tQsGXy94TecNyKuY+TM8isl24ZwP/PNnTnjtCasLptW5n2iLOxPlAp8AUNyB8jtcyA2A8xtsLnAbnD/cgBJ7T7i0YlIwnDBQVg1aPOoLRIx8tdqmzzizmY+J4VqMl0CcA45rf7sfFmxOM8nbC9YETIN3HkKPmgnuO/Lr2e1MiexvL1gH/S/6LvhfTwJ8JSF+K/MZWjkIv2wXhtYOLWf+hzk34z3hrQlTX8MJaz2O9Kg7OU6+mQNfyx4H8TXIduU50uA5e/Zhwb2gT+YOCwbvElzXvUZAG5/9NDkIP3Gmwfkc08PmW0vP77DgnvMM3NoF1yvx7H3ehF6ObBfOfuJMizdci2yma5vdGy+xe5PlJvwXAAD//7/yE50AAAAGSURBVAMAjYOgxQ8rKocAAAAASUVORK5CYII=" alt="Prescription QR Code" /></div>
+        </div>
+        
+                <div class="location-section">
+                    <div class="location-title">JVM</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CPZ (50)_ขาวเล็ก<span class="med-bin"> (iL7 1-7)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">FOLIC ACID TAB. 5 MG<span class="med-bin"> (iL7 4-1)</span><span class="med-timecode">t1+1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">METFORMIN 500MG<span class="med-bin"> (iL6 3-8)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRAZODONE 50 MG TAB<span class="med-bin"> (iL4 1-8)</span><span class="med-timecode">t1ins</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL 2 MG TAB<span class="med-bin"> (iL8 1-1)</span><span class="med-timecode">t1eps</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">TRIHEXYPHENIDYL 2 MG TAB<span class="med-bin"> (iL8 1-1)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div></div>
+                </div>
+                <div class="location-section">
+                    <div class="location-title">LED</div>
+                    <div class="med-list">
+                    <div class="med-item">
+                        <div class="med-name">CYTISINICLINE TAB. 1.5 MG<span class="med-timecode">t2+3</span></div>
+                        <span class="med-qty">#150</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">ENALAPRIL TAB. 5 MG<span class="med-bin"> (iL1 2-5)</span><span class="med-timecode">t1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">FLUANXOL DEPOT 40MG/2ML INJ.<span class="med-bin"> (iL2 2-1)</span><span class="med-timecode">40 mg IM q 1 mo LD 26/8/69</span></div>
+                        <span class="med-qty">#0</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">P8 MG TAB.<span class="med-bin"> (iL5 1-7)</span><span class="med-timecode">T1+2</span></div>
+                        <span class="med-qty">#2</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">P8 MG TAB.<span class="med-bin"> (iL5 1-7)</span><span class="med-timecode">T1+1*</span></div>
+                        <span class="med-qty">#1</span>
+                    </div>
+                    <div class="med-item">
+                        <div class="med-name">SIMVASTATIN 20 MG<span class="med-bin"> (iL1 4-3)</span><span class="med-timecode">t1.1</span></div>
+                        <span class="med-qty">#1</span>
+                    </div></div>
+                </div>
+    </div>
+    
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    CYTISINICLINE TAB. 1.5 MG &nbsp; <span class="drug-qty">#2</span>
+                                    &nbsp; <span class="drug-timecode">t2</span>
+                                </div>
+                                <div class="drug-inst">2T tidpc, กิน 2 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น<br>17:00</div>
+                                <div class="drug-location">LED (No location)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEfElEQVR4AdyWgZLiOAxEefv//3zHi6ptETvA1FzVLUzRSGq1nLQC7P7554v//ty++G+YA27wM7gXqBnzDige6PSRA+NaB/HiDaYe3ss9cpiz+DYs5u5fwdsrvLOEfsaVXg3Uk7jSdF79K3T9Yq43Pz2/NAe1UZhxZzabhKkDhhRmHjIz1j23DoDje5m6R6gezNj7yS/NRfDJ8dfmoLaXJVw9CftQWphRfodn5+z0O+7X5s43AXXju4udtdZnHVzPn7Wv6l+be3WB/7N/ac6tnvHOjWYmWmvYPw0gshHVi0FsEvtnbGS3S3M78adxizng+AmG69hNQumySag6GmD8pwCqF200RqieuYDHunNQPVijumAxl8Y3xGEu2/xJfGcBnge14Xf00TgnrI0/hXPDHDzeAFQNqDsALB/ZXBSqdwjvbzDraO708oKpswmP9RUX3iig5qCi3DBn8W14ac6tw9yGC5AT5oG1ONdAqPHDchvMbXDOdjTJSIGHT44NKM5c5Azzl+YUfSouzWUDMH/KYxLmtmDm6ffoOb02h5qxB5XL7wDs6IXzLNEbl+a66FPzxRxwfK67ISjOzXTsNJ27ynMGzE8F1DWgYmbVJk+UE6l7hDm/mOvCT88vzUFtwA0FMQvVs07vHGFq1AlYOXmReXMBpYX5dKOB6qkLYOWGuQwmZsgIj4NdA4899T8B1DxU7GfnHKgeVIymx2jDWQ9zFt+GYQ5qKzHYN5AcSgMV5aN/FmHqnYGqnbHugOqFUxPsuGe9YS6ib4qLOajNQUXNQuXZXCLMLzuUBio6JwDDFp5zbsiJzlsL4PhnCtbY9ckXc2l8Qxzm3ExHNxc+HNTmrGHm1kFmejz3gFA/ijlzNwQcT9feMGchYDatd+iH93yn7RzU2VDRWag8OniswxvVC/Mr2Bf2F3OS34JhDmpjuhbdIFQvHMwaZp6+EYoHLA94bgfMH6RDcH9L/54eL2tgfNQkYdb2BRQHFdUNcxbfhmFO9yIGzQVcb9d+9OdoL4C5zbPunTrnnLXy4cxFauMwZ3G7fdf7Yg5qy1CxbwOKgxnP61AvwsN88jDnoPiuA1Ie3zFgG4fonkBp7unx8trCYjEn+S1YzOm6oxvtfPL0U0NtEiqmv4vAQgPH00oj5/aYHpB0G4c54DgU3o/bE0+kN3WiRmkP6nrmYjRbAqVp1JGqD6A0UFHBMGfxbVjMZRPP4rMlZC4aqE1C/YCkbwQiG1FeDOKeWIt7+vCC5/OLuYfpDy8uzQHLd3Dn1Y0KKH00csLaKMzPkBdnPjXUuTBjen3OXKRnvDRn89Pxa3NQG71aRN8mrFpYuX6W80Hnk8P1/K/N5SLPbuCsgXlD5zmYPecAwxYwf6QiAI6vk/V/Zs7D/jZcmstGe9zdfPpQG4OK0ULVQKgRnQWOTUPF0dwk6s+AmoOKfezSXBd9ar6Yg9oAXMduFkrXuXOebUNpU5911s96UPPqzshcov3FnOS3YJiL459El3CltyfsG4W5MA+sO3b8mUttzKz5Gf8CAAD//12NMu4AAAAGSURBVAMA5mEx3qtVLPwAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    CYTISINICLINE TAB. 1.5 MG &nbsp; <span class="drug-qty">#2</span>
+                                    &nbsp; <span class="drug-timecode">t2</span>
+                                </div>
+                                <div class="drug-inst">2T tidpc, กิน 2 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น<br>12:00</div>
+                                <div class="drug-location">LED (No location)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEe0lEQVR4AdyWgXIbOQxD8/r//3znJxqSVquN3eZmrt5OYJIAJBt07ObXPzf+9+vrxv96OOALfg/uBeqM/QwYPFQPx6ofirMXUDNU3XFQGlxXz/VwDnfDKdzjI/j1CrslwHGL8QBp+72deDR5LqD95jyo9hO+Dc+HcN/Vp7WVU7jG3uThMhzUJmHUdzKvW/VMOPtXiBfqeXd+KA1G3fkuw+3Mn8b9OFw2nQpjm0D7nK1LiXfmd9ys/0n/43BwDuMLzYsB0n5bgfaFAlW9Q3x76IX443Av7v9f5ctwbm3F7pXGEw1ebx7KA6Pm/Ds1zznX3bnLcDvzp3GncDC2Cft+DgnlyRZnbe3h7F3PZYbyzndAcXBdZ/8p3Cx+et/DZWO/Uw0fv/2fAOpdyD1wnL0z2u9Uz/VwUJdKzoDi4b2aFwDln+9KD9daPKlA2l6B9t+GBFQPx6rWwzncDadwcNxA3glrwtuLzLuqLnba15NUD55U+4tGDup1hLfCkYP6C0h/oC84hYtwh9rDJflaobYF9LxA+51fvc7d9Gxmzn6GFqi7oKqcmH2w1/RBaVA159R6OIe74a1w8zZcQGbAsQFo72YbHg8wZhj9Q+o/QO9zZyc2TTxAey7n2OwFlCb/VjiNn4hTOBjJ10BuRsDwwOhXvzNg2cK7tsJEwjgPtHdskk/frt4p9PRwUAcVhKKYe9h79F1hdz5eGF/lMwf1PEDoVr1LtOHxAEf9QR1+ergDe5PhFA5obz2MumaF0txisHrCA10K14mpAdrzhorXGm6t32l6T+Ek74Iezi2IBLMXzrDfKhQPaHsJ4PDuzAd8rhlQXqDbgMN5oGtpgO7p4SLeqb4Vbt6oPdR27LMMe5EZhkd+BpQWrxWO3OxPr28FHM/Neg8HZdpdBKVB1Z1nvnTuoc7AqNG9J/1VBa6k9n9cRO+aId/DOdwNp3BA+0BC1V1gKA04yUA7H8Ftpk+VE85QfmcBNUNVOX2vAOWffadws/jp/WU4NyYMaL2CuoDaXHxyAsafWDtNj4A6by9Wr1wQDc53w7hnCZfj96iX4WBsIFGhOBg12lqzXWs0qHOZ1a4A5YVRcw6K8yxUD1XlhN7LcIqfjh7OtFdIyJ2+alAbDD/XnJ+59FDnoGr4nJlrNBifuZkD2tjDAe0rHN6v7YbnA9S553i4a+UyW+F4Tm4F7D0GjtdeZLb2cA53wymc6V9ht4T1TDzycz/PcP61ineunhEzt/ZQ764+oX4KJ3kXXIaD2gSM+l1oKF88bk84Q2lQVU6oQ3H2Qn4GlA6jRofBeVZAcXouwyl+Ov7zcDA253IAyxYwPnNA+4Zdjb4bV1i9zvHa/zjcfJkXZobxYsOp/wQw7sw9uRtKg6rqPw7nJX8rLsNlI3P9kxCeh9qmvZjvgdJmzl6fsIfyOAs5sfbOgfplOMVPxykc1Jbgus6hoXwzt/bzNtWgzsg7C/sZUJ5Zg+KgqhpUD1XlglO4CHeoPdy8tXd7F7B65UR4+xWzNvezb8eHS9WfPlUu+BcAAP//fN6LcgAAAAZJREFUAwBiVHDeAqxUrwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    CYTISINICLINE TAB. 1.5 MG &nbsp; <span class="drug-qty">#2</span>
+                                    &nbsp; <span class="drug-timecode">t2</span>
+                                </div>
+                                <div class="drug-inst">2T tidpc, กิน 2 เม็ดวันละ 3 ครั้ง, หลังอาหารเช้า,กลางวัน,เย็น<br>08:00</div>
+                                <div class="drug-location">LED (No location)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAET0lEQVR4AdyXAXLbOhBD83r/O/8fCAW5EknJjjudSplBsIsFaWMjZ5Jf/z3469fXg79aOOAL3oP2Avsz0gTY6zD21adagL1vpsHeA2Ovcy2cmqdhCPf9Efy6wtkSwFuMR3fVuvbS1QswnpMuT6D+CvGKh3ASn4JlOPAmofNZ6NVGdSYz1VeIF/y6Mz94Bp1nvmW4mflu2sfhjpuGvk1wfVxKzlR9ptX5T+qPw8E8wLtvBnwPmP9E2I/DvRvib/qX4bK5yrM3lnlm6StnFgb/dKBzZq9wvTv17Nwy3Mx8N20IB32bMK9rSLAnGwT38QAp25938WpQ69oDm19aANZgzfGKh3ASn4IWLht8h7WE+FUL6cHbVS99Beg+eWHf65z0d6FzLRz4UokVYB3OOWfAvvQzhmtPzgEpGwPtkQXXsGeZWzg1T8MyHHgTZ4+DlpG56oqVvnl+f4tH/Ftq/5GAXz+6GPYa0Py6Q5AvWIaL4c7cwim18EoY8AblB9c5J02Ava659AppYB+YpQnVB/OZfOAZmHNOsxZOzdPQwoGTHwMCR6k959Cf+ZiA7TdZNgjugVgaQ9fib8NJEQ/QXiO240x6C6fmaWjhjsnTKzB4U6oF2PfSgpyDtad6U68YaCNg+4k14bs4vl7679FXC6dmBpmjgy+XFoC1eM4Y9l5YP9aw9+revKZqARAtcRluefIGg2U4YHsEgCEG0GbZJlgbzEWIt0ithP35eMXNdCjOZrIuw2l4dwzhtI2KGrDqqcEbT1/9qqWLBbBX9RHyVUD3Roeu6Twg2gHYniqJQziJT0ELB04Me1bQ4+agezQXwJpqoZ5JHYa9V37Ya/FqdgbYn6veFi7i2aWZnXHuqQx+A2DOTPekXjGwGm1/KWWouyqkD+EkPgVDOKB9IBMS9hq4h84rr7aZWViaoB58h3oB3INZmnxXAPurbwhXh3evfxRO2zwii4ieHvqfWLNZ9QFpt8+T/E0ohXQBxruB9uQdwpUbHlBehtOGguQFbwdGjmfGYH9muXfGYC90zjmwpnPgGszSBHkvw8l0V7RwSjvDLFj1HefgDYK5znOuaqnBfjBHz5nKmUH/zFUN2NoWDtg+iPA6bzdcfNObigV8d3oxjJr0Cph76t2qhXquhaviU+ohnNJfYRY+ZzJLD0Qafr3D+Fg1cylyV5GGEtievOodwg2nbiwsw4E3AZ1fyZnNgc+pB9dgzj11plrILAw+A51nM50VwD55luE0vDv+WDjwxsCsLQqw/lxBn4HPHReqO1Y4etXHq/rjcPUyXZge+psF15nJ9xOA76lncyd4BmZ5Pg6nS/5VLMNlI5VfCQHeXD2XGjyr98CoaZ4zqsGeqklXLxZUV0hbhtPw7hjCgbcEa66hwb66NdVgvXpTg2fyRVNdAfZoHh2sgVkzcA1macEQLoMncAuX7bzDWkD8qitmerSw/LVWH8z0aGF5U4elBf8DAAD//ySD1EYAAAAGSURBVAMAarOI3rfQ0dAAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    ENALAPRIL TAB. 5 MG &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>17:00</div>
+                                <div class="drug-location">LED (iL1 2-5)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEaklEQVR4AdyWgVLrSgxDOff//5nHiUcbZ5Nt4ZU7cxsGIVvWbiMDhT+fN/7483HjjxEO+ICfwb1AnbEWcOy7BjWD4quZ2gwoP3yfvWOEs7kbTuG+fgU/nuFqCVBbzVmo/sp7peVcZnA+H88jznn5FE7xLliGg9oc7PwodLYJ5Y8XOP0kZCbnnLWA43m1GVAe2Hn22C/DOXx3vBxu3vxVPy8pHmCMgO3dOrMxeKF4ORzUQ83P0B8Srj2egZp1v/pv4OVwv/EQf+uOZbhssvPVQ2QO9R145MkMzl44a/HPnNfsPHvsl+EcvjtO4aA2CGvuoaF82SJUHw+QcnvDgP1Pg4Ocs34GYNwB13W/4xSuD9+9HuGywZ+w4eOH2qRah/P01qL3qcNwvsczP4X3jXBwvlQDlA6PWe8VgCEDhx8rB1CatUgIawFIBwDbPYpQNRzZ2QhnczeMcFcbg/rlT+h4wtHlaGGoTToLMvv8/Nz+34wuZ2a9AhzvhHq+nJX72RGui3epRziorUCxWxAGlYW1gN1jL6A0a6FfWAdw9ESX4XrmHVAz645+Do4eZyOczd0wwmUjCQi1CXuoGopnr54rLbosrjzRwvrE3KsFsD9HtPihZuojnM3dsAzXN5E64WHfziNtnkGdg53jCUPNet9rIO3GeTZg+9uX3uEIBzVUfIZ+Qa+vzsH+dp35szP64Pw88zlA6xIj3NLxxoMRLlsJA9u3uWd7NIsP6hwUeyazRwzlj8dzIv0VP5uPcFeH3117Gq5vB2q7agIY+e3FEFoBnH4KHOuH40xNOJ8BRy8wW7bXgdKfhjudfiNhhAO21Hl2tyfSd4bdC3vdPalhf7f0PgF1Boht+0e6z8bgq1AXX+XpEzg8dzeMcBGhzLBzZr7ACvGE40u/4vigXi8+OPbRO3s2vXWH+imc4l2wDJctGBRqi7BmfR1QXu+BqqFYTeiH0qxXgP/nWYZbvdA76d8K55avYNDo1mLuAeUN82wTn3zJGTlWawHrNyu9Uzil+2AZDhhvsbDXRodj3zWomZsNnHdAedTimdmZgPICthuA7dk8A1VDsZrQuAzn8N0xwpn2GRK2++C4scygdCDHTqw3IrB9N6A4up4ZmcH+O9c1YGtHOOBwOTzvtxsWX/oDzZbM1KFex3oFuPZ4T85Yi/TyCGdzN5zCmf4ZHi0Basuw88oP5x+rvHY/c6X1uTXU63XvKZzGu2AZDmoTsPOj0FC+2eMmZy29M6hz1gKqjweqh52vZp4VUD49y3AO3x2/Fs6tiauFqAvYt6oPkA7QJ7pof4XuSR2f/cvhchmw/SlJH/ZFoGbWM7rPGZQ3uqwuoGbWgXMBNYNi5y+H85J/FctwbmPGd0LAvrn4H90DZ3/OyYC0IfdszdcX+y/aPq07FJfhHL47TuGA7XcH1txDQ/m61mtgtMDhbgfZtrVID+VVC6A0KFaHqqFYLTiFy+AOPMJlYz9hF7DyOxPOZWE9Q/0K3Zd516zV5Q614D8AAAD//9zU5+oAAAAGSURBVAMAoJNn3k+LdnEAAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    ENALAPRIL TAB. 5 MG &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>08:00</div>
+                                <div class="drug-location">LED (iL1 2-5)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEZklEQVR4AdyWjXLbMAyD8/X933kzxECi/tyk2e1q74pABEE5YNquX39u/O/rceN/NRzwgPegvUA/I02ApqvOgLkHTYN21hy0Gl47a66GU3E3TOGOH8HHd1gtwTPuuRZbg9i669yzdsbyf4c8P4XLzauft+EgtgyNV2G9Sfeg+SHO7tlrtv4uQ9wLjVd3bMOtzFfTPg4Hsb0x+OrTgfBC8Dij2nNmaT/Fx+H8JiDe8KqGvuc3C6EDlioD5b+mKvzg8HG4Hzzzv41sw/kTyHz2ruwbPcAodbXnzMC3n5i9mbtLn8U23LN/aZrCQWwO9pwTQ/isQdTeqnSfYe6pL8C+p74A4YE9y2dM4dy4A9dw3u47vFqA53MPYtNjTzWse3levneh+RoO4iESBYgaUFkAlB92aOyHFsPxAq0HHMqj/q0KlPkivvEC6zmg3gKUuyFYjRpOxd1Qw42fQK4htmEtM0QPgt07WxRPL7C1re4Bpk8HQvNFea6Gc/NOvA0HsRFtwoEhNAi2LpZP0PlVnPkhngHU6+QXqpAO0oUkPbbhsumq5xoOmL6fd6G0ISH3oZ9X34DouTa/Om8f9PdYzwzhkVbDqbgbtuG8XaBmzhqEbq2aFofRA5Tvkmy1xwzhAer/k2Mvz0P4s7YNl02+1NpYS7dmliZAPBQa2wPIUgBMgUvjeIHoQbDnMx+28mVNxUvhZLwiaricWEGgbQniLF2Avt5p0n2vWLUAbV56BkQva5oRrOk8YtWr4UbzHeqXwo1byTXEpsdlQOjQOM/ZD60P7ZcHhC6f5yA0mFm+ES+FG4euUtdwENsY3zhQJaD8RoPg2jgO3u5xLF+uM5fG8WLtOE5fEHefec56EPO6uIYbB1yLIQZ0zgB0RwegWwC02kYIzbU436szhAdQu0C6UIrNi/qC2jWciruhhgPKxpVagKhXgSF68hnQa3nOHmuuM0PMjx7XmaF5fQeEBsHy13Aq7oYazhtYBRx7riG2BO1X+Gp+pwG15TstAOU7yfWKNWNdZ8G1uIZT8Xjc63UKB/3GgCkxULaqTRmT6SmoD+F/SkuCvQeiB8H5Aug1PU+QZwon8S6Ywin1iDGs+9Kh35w0wR5AZQFQPvFSbF6g9/iezB4FfFxyDQeUB8PrvLoRYt49val8Vg3hGc+q7c0M4c+azvIbEB4IVr+GU3E3TOG8iTM+W4LnoG3QmudcA5ZO2f7RBPN89k7hxguuXG/DAdPP4CqoNwW9f+WF8OSe562NNcQMNM7efNasa/E2nJpXx8fhIDaqrWV4MYCPpwx03ynZ7Huz5jPEnOvMH4fzZRAPgWDremP5rBp6j/uZ5ROyNp5h/psW2t3/LNz44N9Qb8NpayNWb3j0jLVmoG1TtSEvRE9nwT1oOrSzPBkQPQj2vHgbTs2rYwoHsQHYcw4N4bMGfS3dm4bo5TqfYf4ZWs1LG+F7zOpP4STeBTWcE7/DWoL9OgtjLc0Ye6rPerkvn2pBZ0O14DrzXwAAAP//+YikXwAAAAZJREFUAwDuen/eEGgqCQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    FLUANXOL DEPOT 40MG/2ML INJ. &nbsp; <span class="drug-qty">#0</span>
+                                    &nbsp; <span class="drug-timecode">40 mg IM q 1 mo LD 26/8/69</span>
+                                </div>
+                                
+                                <div class="drug-location">LED (iL2 2-1)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEeElEQVR4AdyWC3LjOBBD583975zNYw8oip9xEu9WrZ0K3B+gKaNlJ/r98cY/v3+98U83B/yC78G9QM2YC9jXUH1AWQdwu24nhgTuGnhcO97NWbwbFnOfX8Ffj/C3JWQWarvW0ZsLKC59o31hLuCsUXeCs8FiLsQ7xKM5qM3BFb9iGEqfzQL9kzDPw8pBzc/asYbSwBVHPvnRXASvHJ82N94hoO8CaH8F5XvzT2Iv+NNqWljvZPifxKfNQZnIxXdvOhyUFtY4z2Xmmfi0uWcu/l/PHs1lk2PcvZnw4aDuSuoxztqRg/PcqDPPOWO0P+Nobha+Yr2Yg9ognONoFEqXLYaba/uwanc6tTtAzcM5jnOLuZF89bybywa/EzUfvfkIqO2Ova/ksM7lGt+JXqubg/VQBVB9+FrcvQGoWc8TcNVw5XKZNxeA4Qag/V+0CZXDPcp1cxbvhm5utzGg+Z25sU6eCPSttuHhJZqPj4/leTPcIF9SuJ8N1xPNbr6bW056g0Y3B/et7DaRHpTWGiqHivNO4Nou7DXzzFiP1zAfoQ7qTKgYXq6bs3g3HM3BtYnZ9LidcOkljn2os9Ib46wPd+rLQ52nxlqYCyjO3tGc5KvjR+agtgM89A/Xd87NCuD4FxXuHNCvASxzniegOHPhUDdnQ8BdBKhrANrh6oJGfL5AcVDxs9V+1cG914gHL7DOeJbIKJB0G7u5LfvizcWcmxFAv0uzRygOro9cNM4KKE36Y5QXQG8D7XppyIvUu/iIX8ztDnnVXjcHtTmoGENQNZDW7dEJaBt3iwLW2r6A4nLQqWc/mjHCfR4Y6ZYD7f1YdHMW74Zuzm3tMBoOD7Wd1EaoXvRwr9M3wsp5hoAz5+wMWPXRdHNQIqgYgRcM5h6QVo+zVgJoH5UdJy+gNOYC7rW9GZ6XnvkI+92cxbvhaA5qc8DiGeh3Aq7czcG9dti+MBfmArBssBat+MEL0N7TOHo0N4peNf+WOajtuGGhaaOA4uydAHeNc9HCnUt/1Iw9+3A9RFgLuM6ZzGX8PeJDc/M2tA3XdqxHqBdwaeDKR6252h3kBNQsYNkAtO+Xc1A5VLQnFD40p+hV0c3pdgeN7fr25KA2Zj5CXtgzCvMZUPNwj9E5NyMcXN+5sQe0spsD2q2Gr8d2wvQC9/mJPpYxsBNAnTlzzqRnLlIbuzmLd8NiTvePsFvCaWanTQ+ujxXU3ck50Rh3PfsjYJ1fzI0Dr54fzUFtAq74N7NQulnj1uHOQdUjZy6guJwDVcMVd5yzAkqn5mhO8tXxr5lzayILgWuD6cmL1HB959KTF6mN1jvIzYjO/tPmchisZryAiMZcpDZaC6h5qCgXyAsozjyIBoqDivJPm/OQ/yuO5rKRMX7HROacgWub1iPgzKkDDA3jmTasjcJ8hL2jOclXx2IOePgYNpqG0mdr4aD6QFo9Au0avfGZZD4RVg1UDyp+jrVzoGrAVsdirjNvkHRz2dh3ov6jNx+R/hjDp2c95tZB+sZdL33jiGiN/wAAAP//Hi3qaAAAAAZJREFUAwCETHzeTzj3jwAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1TOD.pc ย, กิน 1 เม็ดวันละ 1 ครั้ง, หลังอาหารเย็น<br>17:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEdklEQVR4AdyWAZbbRgxD9+f+d273i8EMpZHsddz21coLAhLEjAWu7eyvv27859fXjf+McMAXvAb3AvszagKmbt8BNVODWfcepg5Vw8/Zu0Y4m7thCff9Efx6hrMl5AzUdrsHSoPiPrs6F/3Mm9kZd/8Srg8/vb4MB7VlmPwoLJQv24w3vRwtDKQcrE8A23fAGLQCagaT23iUl+GG44OLt8O55Y7jLmBut/us9ULNrf9pvB0Onj+cQUQeHuYZ9Q6oWbSc+RN+O9yfvOh/deYyXDbX+eyhMofaOBTH6zz1GUP5ofjMc9S884ijx/4ynMNPxxIOaoNwzT00lC+bzCw9EGn7agfGLwkO4rMW6YHNrxZAaXDN8cpLOMW7YITLxl5hlxA/1DbTOwugZuk7Q81yDva93sxeYc+NcFCXKnZA6fCY+xlrKL91kIeDdRbPkYGjtL1doXRg9DBrD41wNnfD03Bu+xha7QpHb++hNvv1W+x3/JbGlw3svc5hr8H8cspd+oKn4WL8RL4MB7UlWLcDc3YMDTXLJuV4rDvUofxQrCa6D85n+qBmUJxzzi7DOfx0jHA9saHSy/YC1u1Aac47oHSgy7sa5rtiN7hofBYBbN+Q1rFaC6iZ+ghnczeMcDATGxL2vVoA6wxKc3si3jOG6YVZn50DxhXA9hMbwnfhGQE1sxbfo68RTkFAmRwKqB6w3aDvCsD2AH2+Hfr+B/YzWN+WUB4o/j42/ubOCEDKUx7hTqcfLo5wwG7jyZVtydGgvOllKE2fgOqdBeoifWfY+/WJ7jnWz+Yj3PHgHfoRzi0IqA1aC2DktO8Atp82MDzHAtbPVTzeBWx3dO1Mdw57L6C8AzDuG+F2jps0l+FgbgBmbW6o3g3bC2sBc2YvnAuoGRSrBfrEsVcLMusM612Zj3BQpuNF6WVYPeoC9jOo3heCWdvrF72GvceZAKRT5A6H1h1qI5zN3bCEA7YPZLYA1cP8YoDS+jKO/t6nDucc1D2w3g0180z8jxjK3z1LuD789PppuLPNqQlgya8ugPEOiAlKS98Z9jPvEN2TWl3A/InbC5j3HMLl+D34pXBQW4HisxXAOoO9BtW76StAeWByXg9K8yxUDcVqQu9L4TzwSRjhTNvRQ3T9WENtDIozz3mYn4toYagzsHI8ua9zZrDeDXWXnhEOSoSfsxcEefH0jzheOT5rkb4z1DN1zbr7rYV6MMJFuBMv4Uz/DI8WAPste9cjv3Pxrgfqdb1LeN8STvEuuAwHtQmY/Cg0lM+tiXihdCDS9p87sPEQLwooH0yOFabmawooTc9lOIefjn8tnFsMsqRjH/0R58wZn52Lz9nb4fplXvgTnJ2B+Xa6ugNWT+6CmkGxd7wdzkv+r7gMl410fhQiPqjNQXE/Az/TPJP7rKHOdU3dXhbWHWqX4Rx+OpZwUFuCa+6hYe/r27OG+fufvejnU6t3QN3rPDqUBsXOoGooVguWcBncgUe4bOcVdgFHv1qH89732lnQdeszPVq4+7qmLv4GAAD//wnFbbQAAAAGSURBVAMAG86v3uK/X08AAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>17:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEcklEQVR4AdyXgXLcOAxD8/r//3x3zyxkSrKTTXMznXVnEJAgJBtMtk1//fPgP78+HvxnhAM+4HtwL1BnrAXMfdegZnCy868Apx9eq71zhLN5GrZw/30EP77Cd5YAjPvWcz4H6juxzq56/V+hn9vC9eG717fhoDYKJ1+FzSahfFf9eq57Uq8eqPtW3R5qBierr7gNtxrfsf9xOKjt5TsA1fdlwKxB9Z6BqqE455yJ9H/CPw7nCwiYX66/jPMrwP6XDdzf0+98pf5xuFce8rc8t+GuNv3KS67nPAPzdwPmXs/VOfUrrF77K99tuCvzu2lbOKitwj33kFA+tyeg+njg/FxBzfSJeGSombWAue8a1Ax21hds4TJ4Ao9wbvK76AuA2mLXflLnXbwj9XfYcyMczC8H1QP6DgDb/xzywMPQvkB5laDqKy/UTJ+Aub/TossC6hwUq41wNk/DFg7O5GvYbL5zPF2z7nrqwa3Qe4VmGSXUu0GxAzhr+9xlvYVTfApGuCRe2aBQ24HX2XMCkCYAx2fXZ0HVk6E1QOvuS+8S3THCdfEp9RYOOLYKxW4jSOj0crSwmkgv2wtrYS0A2wnA8fyI+lKH1UT6znCe38J147vXIxyciQ3lZoR1YC9g9jpXF1Aza+EsgJpBsboeYd0B5YHz1zd9Amp25e/aCOchkSHUBUCkwfqEgiyA6ccJqnemr0NNqEH5oFhdOAugZlDsfEW80e1HOJunYYSDeSs9KNQMdo4vG1sZzjOZQWmejRaGmqWX9QlrYb1CXXR9hOviU+oRztRiDXanqYv4oTYOxdH1BDDP9EBpUByvMwFIB4Djcw07H4blywi36I9ot3BQW1k32NNCeeDk1Q816+dSxytH+4z1iXisRfrOcD53C9eNd7UXiz6HulRdZAak/JQ9I4DjR+/K7FxczaI5F/Z/FM6D74ARDmpjphZQPbz2G4JnREJbC3uou6xX6BHRrUXvYT4PZ69XQGlQ7PkRzuZpGOFML9aAXYPailoQP9Tsro/eGejtbb0+K0b1XvdefYSz+fh41tctHHD8beUWhHFh1qB6OD+P+gTUzFrkDusVfQbzOagedu73QM2jeaew38IpPgVbOFOLHtBeRLMOYN7c6rGPN6wWwHwe5j5nOvezqa94hIO6FF7nqwvzEnDeEx+cGhD5SwaOj8pqzLNkKA8U6x3hbJ6GLZxb+ApXS8iZdaYO5zadqwnrFeqi6/aia9aANEGfUNzCKT4Ft+GA4+ccTr4K7ZZEZlD+3jvvgNmjN3PrDigvnJy5Z3rde/XbcA7fHT8OB+dGYf9H3QVBeaw7gNECx0/KEH4XfjeC39JEcH1O04/DeYlYX6D3qWF/kczCMHsAr78E7MsExpL+t3CXT//L4m24bLLz1btmDrUxKI7XeeqVnUH5oXj19F7/CqhzUNz9t+G66V3rLRzUBuCee1goX7RsNv1nDGzjz84D4/O0Hsy5sPMtnOJTMMIl8XfYJax+tTus3qs+Z/ts1dLL8Vmv+BcAAP//i5hlmQAAAAZJREFUAwCOP3Pe8ardLQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>08:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEVElEQVR4AdyYiXIbORBD/fL//7zrpzZIDg/5Sm3tyBUY3WiQI7TiI/nzzwt//Hl74Y8WDniD78G9QJ2xFrD26iOge6DXeqB6KN5pUDM4s+daOJtXwxLu/Uvw7TPslgC1xZyF3kPVUDyen/2ZRU8vR3vG+oIlXAavwMdwUFuGzl8JDOUfvdn0qFkD0gXxAo/vAZfhRwM1g84fowsdw11cN21+HS6bTv70YejbjRb2DNTc+m/j1+Hg+YtLEDkvHvoZ9RFQs2g58xP+dbifPPS/OnMMl82NvHtRmWcGtfmxT71jKD8U7zyzlmeOPHvsj+Ec3h1LOKgNwpnH0FC+bHGczTWs3vlceijveAeUBmce/Uu4cXj3uoXLxr7Dho8faptqI5zDfqYPaqZPwLXXo/5deK6Fg7pUcQSUDs85Z/IioPzR5Wcz5zsAiwy0316gariyh1o4m1fDMRzUJsbA2fzI49wa1nPqAj5mNu/Y3RMNrt53++PdAiwfAJZ/wTwGH5+O4T7mt6ZjuGzQdKmBtj3AUdvco3n/FO97+fgD5bPJLKwGLHeqxyNDedSFmrCGmkGxunB2DOfw7jiGg74J6LVbCXbh4erdeaJB/5qJ9ozzXOjPiH+eqR/DObw7WrhdcsPBul2ozTn/DN47e6DOO4Ne2++80aC86WXPCKiZtXDWwkENFYUGYQ01g2J14SywF+mhvOllKE2fgPPioLyeCzwj0gMpt9zCbac3Fz8NN24qWYHLt2/ovX4R78jqYtRSQ92RXp9Iv+PP5p+G2116F20J5zZEAgAp2w9s50EbPilOXnXg8bcgx9UEdN1eQNf0A9IFQLtvCXdx3rxp4dyMSB7oG5g1WGfxhL1LpJehzkGxWqBXzP2oZTYyrHdl3sLB2eQDdvCSWYf1HrhqOTOeh6vHmQCkLbwnA+sR6i2czathCQe0L0jDug1ZQM3gzPqF/sB+RHTo92QOXYP6IR//M4Y6N3qWcOPw7vWPwmXL8rwAWDcYD3x95t0iZ0dWF1DvrHUA/RlTuPGK+9fHcPMmoG8JajvQtXkV0D1QdTxQfZ6xYygPdN6dhz6H6+s5hstFd+YWbt5eQo36ToPaXGY7zh3zDOosrBxvzo6cGVzfKXWou6xbOCgRvs5eEIwPtx711GHnwaylHxnqNY2atXfIwlpYBy1chFfiJZzpP8N3FgA8tedZz0xf8QCPXz5G7xLu2UPuNjuGg9oEdP5KOCh/vG4SrhpUD8R2ZODxjkDnmKFrPkdAaXqO4RzeHX8tHPSNzUtxoyPm+bN+PDfXu3PxOPt1uPEyL5x7tRk7D5yXk/OwenIX1AyKPfPrcF7yf8UxXDYy8k9CAO0Y8Pjm0IT3AlbtXW7/GWUN5clrURP2srAeoXYM5/DuWMJBbQnOPIaG8kWDax9dzmatZ2QWhn7PrEGfQdVQPN67hBuHd69buGznO2z4r/j17TCeneeZjXq0sLPUYbXgXwAAAP//HohYVQAAAAZJREFUAwDlZnDeVc3r0wAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1TOD.pc ย, กิน 1 เม็ดวันละ 1 ครั้ง, หลังอาหารเย็น<br>17:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEdklEQVR4AdyWAZbbRgxD9+f+d273i8EMpZHsddz21coLAhLEjAWu7eyvv27859fXjf+McMAXvAb3AvszagKmbt8BNVODWfcepg5Vw8/Zu0Y4m7thCff9Efx6hrMl5AzUdrsHSoPiPrs6F/3Mm9kZd/8Srg8/vb4MB7VlmPwoLJQv24w3vRwtDKQcrE8A23fAGLQCagaT23iUl+GG44OLt8O55Y7jLmBut/us9ULNrf9pvB0Onj+cQUQeHuYZ9Q6oWbSc+RN+O9yfvOh/deYyXDbX+eyhMofaOBTH6zz1GUP5ofjMc9S884ijx/4ynMNPxxIOaoNwzT00lC+bzCw9EGn7agfGLwkO4rMW6YHNrxZAaXDN8cpLOMW7YITLxl5hlxA/1DbTOwugZuk7Q81yDva93sxeYc+NcFCXKnZA6fCY+xlrKL91kIeDdRbPkYGjtL1doXRg9DBrD41wNnfD03Bu+xha7QpHb++hNvv1W+x3/JbGlw3svc5hr8H8cspd+oKn4WL8RL4MB7UlWLcDc3YMDTXLJuV4rDvUofxQrCa6D85n+qBmUJxzzi7DOfx0jHA9saHSy/YC1u1Aac47oHSgy7sa5rtiN7hofBYBbN+Q1rFaC6iZ+ghnczeMcDATGxL2vVoA6wxKc3si3jOG6YVZn50DxhXA9hMbwnfhGQE1sxbfo68RTkFAmRwKqB6w3aDvCsD2AH2+Hfr+B/YzWN+WUB4o/j42/ubOCEDKUx7hTqcfLo5wwG7jyZVtydGgvOllKE2fgOqdBeoifWfY+/WJ7jnWz+Yj3PHgHfoRzi0IqA1aC2DktO8Atp82MDzHAtbPVTzeBWx3dO1Mdw57L6C8AzDuG+F2jps0l+FgbgBmbW6o3g3bC2sBc2YvnAuoGRSrBfrEsVcLMusM612Zj3BQpuNF6WVYPeoC9jOo3heCWdvrF72GvceZAKRT5A6H1h1qI5zN3bCEA7YPZLYA1cP8YoDS+jKO/t6nDucc1D2w3g0180z8jxjK3z1LuD789PppuLPNqQlgya8ugPEOiAlKS98Z9jPvEN2TWl3A/InbC5j3HMLl+D34pXBQW4HisxXAOoO9BtW76StAeWByXg9K8yxUDcVqQu9L4TzwSRjhTNvRQ3T9WENtDIozz3mYn4toYagzsHI8ua9zZrDeDXWXnhEOSoSfsxcEefH0jzheOT5rkb4z1DN1zbr7rYV6MMJFuBMv4Uz/DI8WAPste9cjv3Pxrgfqdb1LeN8STvEuuAwHtQmY/Cg0lM+tiXihdCDS9p87sPEQLwooH0yOFabmawooTc9lOIefjn8tnFsMsqRjH/0R58wZn52Lz9nb4fplXvgTnJ2B+Xa6ugNWT+6CmkGxd7wdzkv+r7gMl410fhQiPqjNQXE/Az/TPJP7rKHOdU3dXhbWHWqX4Rx+OpZwUFuCa+6hYe/r27OG+fufvejnU6t3QN3rPDqUBsXOoGooVguWcBncgUe4bOcVdgFHv1qH89732lnQdeszPVq4+7qmLv4GAAD//wnFbbQAAAAGSURBVAMAG86v3uK/X08AAAAASUVORK5CYII=" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>17:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEcklEQVR4AdyXgXLcOAxD8/r//3x3zyxkSrKTTXMznXVnEJAgJBtMtk1//fPgP78+HvxnhAM+4HtwL1BnrAXMfdegZnCy868Apx9eq71zhLN5GrZw/30EP77Cd5YAjPvWcz4H6juxzq56/V+hn9vC9eG717fhoDYKJ1+FzSahfFf9eq57Uq8eqPtW3R5qBierr7gNtxrfsf9xOKjt5TsA1fdlwKxB9Z6BqqE455yJ9H/CPw7nCwiYX66/jPMrwP6XDdzf0+98pf5xuFce8rc8t+GuNv3KS67nPAPzdwPmXs/VOfUrrF77K99tuCvzu2lbOKitwj33kFA+tyeg+njg/FxBzfSJeGSombWAue8a1Ax21hds4TJ4Ao9wbvK76AuA2mLXflLnXbwj9XfYcyMczC8H1QP6DgDb/xzywMPQvkB5laDqKy/UTJ+Aub/TossC6hwUq41wNk/DFg7O5GvYbL5zPF2z7nrqwa3Qe4VmGSXUu0GxAzhr+9xlvYVTfApGuCRe2aBQ24HX2XMCkCYAx2fXZ0HVk6E1QOvuS+8S3THCdfEp9RYOOLYKxW4jSOj0crSwmkgv2wtrYS0A2wnA8fyI+lKH1UT6znCe38J147vXIxyciQ3lZoR1YC9g9jpXF1Aza+EsgJpBsboeYd0B5YHz1zd9Amp25e/aCOchkSHUBUCkwfqEgiyA6ccJqnemr0NNqEH5oFhdOAugZlDsfEW80e1HOJunYYSDeSs9KNQMdo4vG1sZzjOZQWmejRaGmqWX9QlrYb1CXXR9hOviU+oRztRiDXanqYv4oTYOxdH1BDDP9EBpUByvMwFIB4Djcw07H4blywi36I9ot3BQW1k32NNCeeDk1Q816+dSxytH+4z1iXisRfrOcD53C9eNd7UXiz6HulRdZAak/JQ9I4DjR+/K7FxczaI5F/Z/FM6D74ARDmpjphZQPbz2G4JnREJbC3uou6xX6BHRrUXvYT4PZ69XQGlQ7PkRzuZpGOFML9aAXYPailoQP9Tsro/eGejtbb0+K0b1XvdefYSz+fh41tctHHD8beUWhHFh1qB6OD+P+gTUzFrkDusVfQbzOagedu73QM2jeaew38IpPgVbOFOLHtBeRLMOYN7c6rGPN6wWwHwe5j5nOvezqa94hIO6FF7nqwvzEnDeEx+cGhD5SwaOj8pqzLNkKA8U6x3hbJ6GLZxb+ApXS8iZdaYO5zadqwnrFeqi6/aia9aANEGfUNzCKT4Ft+GA4+ccTr4K7ZZEZlD+3jvvgNmjN3PrDigvnJy5Z3rde/XbcA7fHT8OB+dGYf9H3QVBeaw7gNECx0/KEH4XfjeC39JEcH1O04/DeYlYX6D3qWF/kczCMHsAr78E7MsExpL+t3CXT//L4m24bLLz1btmDrUxKI7XeeqVnUH5oXj19F7/CqhzUNz9t+G66V3rLRzUBuCee1goX7RsNv1nDGzjz84D4/O0Hsy5sPMtnOJTMMIl8XfYJax+tTus3qs+Z/ts1dLL8Vmv+BcAAP//i5hlmQAAAAZJREFUAwCOP3Pe8ardLQAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    P8 MG TAB.  &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">T1</span>
+                                </div>
+                                <div class="drug-inst">1T bidpc, กิน 1 เม็ดวันละ 2 ครั้ง, หลังอาหารเช้า,เย็น<br>08:00</div>
+                                <div class="drug-location">LED (iL5 1-7)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEVElEQVR4AdyYiXIbORBD/fL//7zrpzZIDg/5Sm3tyBUY3WiQI7TiI/nzzwt//Hl74Y8WDniD78G9QJ2xFrD26iOge6DXeqB6KN5pUDM4s+daOJtXwxLu/Uvw7TPslgC1xZyF3kPVUDyen/2ZRU8vR3vG+oIlXAavwMdwUFuGzl8JDOUfvdn0qFkD0gXxAo/vAZfhRwM1g84fowsdw11cN21+HS6bTv70YejbjRb2DNTc+m/j1+Hg+YtLEDkvHvoZ9RFQs2g58xP+dbifPPS/OnMMl82NvHtRmWcGtfmxT71jKD8U7zyzlmeOPHvsj+Ec3h1LOKgNwpnH0FC+bHGczTWs3vlceijveAeUBmce/Uu4cXj3uoXLxr7Dho8faptqI5zDfqYPaqZPwLXXo/5deK6Fg7pUcQSUDs85Z/IioPzR5Wcz5zsAiwy0316gariyh1o4m1fDMRzUJsbA2fzI49wa1nPqAj5mNu/Y3RMNrt53++PdAiwfAJZ/wTwGH5+O4T7mt6ZjuGzQdKmBtj3AUdvco3n/FO97+fgD5bPJLKwGLHeqxyNDedSFmrCGmkGxunB2DOfw7jiGg74J6LVbCXbh4erdeaJB/5qJ9ozzXOjPiH+eqR/DObw7WrhdcsPBul2ozTn/DN47e6DOO4Ne2++80aC86WXPCKiZtXDWwkENFYUGYQ01g2J14SywF+mhvOllKE2fgPPioLyeCzwj0gMpt9zCbac3Fz8NN24qWYHLt2/ovX4R78jqYtRSQ92RXp9Iv+PP5p+G2116F20J5zZEAgAp2w9s50EbPilOXnXg8bcgx9UEdN1eQNf0A9IFQLtvCXdx3rxp4dyMSB7oG5g1WGfxhL1LpJehzkGxWqBXzP2oZTYyrHdl3sLB2eQDdvCSWYf1HrhqOTOeh6vHmQCkLbwnA+sR6i2czathCQe0L0jDug1ZQM3gzPqF/sB+RHTo92QOXYP6IR//M4Y6N3qWcOPw7vWPwmXL8rwAWDcYD3x95t0iZ0dWF1DvrHUA/RlTuPGK+9fHcPMmoG8JajvQtXkV0D1QdTxQfZ6xYygPdN6dhz6H6+s5hstFd+YWbt5eQo36ToPaXGY7zh3zDOosrBxvzo6cGVzfKXWou6xbOCgRvs5eEIwPtx711GHnwaylHxnqNY2atXfIwlpYBy1chFfiJZzpP8N3FgA8tedZz0xf8QCPXz5G7xLu2UPuNjuGg9oEdP5KOCh/vG4SrhpUD8R2ZODxjkDnmKFrPkdAaXqO4RzeHX8tHPSNzUtxoyPm+bN+PDfXu3PxOPt1uPEyL5x7tRk7D5yXk/OwenIX1AyKPfPrcF7yf8UxXDYy8k9CAO0Y8Pjm0IT3AlbtXW7/GWUN5clrURP2srAeoXYM5/DuWMJBbQnOPIaG8kWDax9dzmatZ2QWhn7PrEGfQdVQPN67hBuHd69buGznO2z4r/j17TCeneeZjXq0sLPUYbXgXwAAAP//HohYVQAAAAZJREFUAwDlZnDeVc3r0wAAAABJRU5ErkJggg==" alt="QR Code" /></div>
+                            </div>
+                        </div>
+                        <div class="page drug-page">
+                            <div class="drug-body">
+                                <div class="drug-meta">24 ก.ย. 2569 &nbsp; รายการที่เลือกจาก Dashboard &nbsp; เตียง 7</div>
+                                <div class="drug-hn">HN 000096274 &nbsp; AN 69-14906 &nbsp; -</div>
+                                <div class="drug-patient">นายบัญหา  ไหลหลั่ง</div>
+                                <div class="drug-name">
+                                    SIMVASTATIN 20 MG &nbsp; <span class="drug-qty">#1</span>
+                                    &nbsp; <span class="drug-timecode">t1.1</span>
+                                </div>
+                                <div class="drug-inst">1T hs., กิน 1 เม็ดวันละ 1 ครั้ง, ก่อนนอน<br>20:00</div>
+                                <div class="drug-location">LED (iL1 4-3)</div>
+                                <div class="drug-qrcode"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAAA3CAYAAACo29JGAAAEYklEQVR4AdyYgXLjOAxD9+3//3OvTyxkWbIat5O7uaSzCEkQlA26SXb69+ONf/7+eeOfbg74Az/DuBf42SyUfjxjl0Np4X70rG7O4t2wmPt8C/55hKslzDOjZu6NdXRQT2VXy49zu1xdsJhL4x3i1hzUJuGIV4ah+ulB1eNmoTg4x8yMEUozcnMOpYEjzhrrrTmbr46nm8sTu7sYqO1Hn/nE8L+JTzMH55uEqoH+ATXfINCpmAFOX0ld8IvkaeZ+ce1/fWRrLpsc43d3E100cy0f7ipCPTF1IhrzGemNcdZYb83ZfHUs5qA2CPv4nWmouSsNnHvAIsvTANp7bxRAcbCPo34xNzZfPe/msrGfxCvzmU/PesytoTYvD5XLC7kZ8j+FZ3RzUBeRFFA17KO6XNR8BNTcyM25szOX2p6whjoL9lHdjG5ubrxD3c25JTGbGjnzEWrhepv2AihN6o+Pj/bFDvsv+GjvRjhfw7luzuLd8NAc0D0D7eMZKtrIkzQXqRMB6Qagzbfi80XNZ2j/4NyDc61I/YiRM5/x0Nw88Er11ty8IU2NnDkg3WAtWvH5ArSnNHLmAqr3KWsawPQEdQKO9yXQ9VA8FHca/iq25r76Lx0emoPaULYItSkoHqqet6BeyBsFnLWA7Qb7Ajg9ndb8erEvvsqmS54INW+9mINqQsXxMPMRUAbloPSwRi8k1AnzwFpAzZnPgOplJlHdmFsH8os5yXdBNwfn7WQDwOIVaL8SauDIra8wHzBq0guXOhFIukTY/+Yo7uYs3g3d3G5z8kB7UjEvJ+DYXHrfRahzYB/nea8TQM2NGigumkQ13ZzFu6Gbg/MGYhRI2iPQnqRbgsrThKrhiOmpF3MtF6QHNZ/aOGtGDkoPFe11cxYCjqZ1DjRC9cyF/QCql3qMUD2omB6QtC0LjtrzhQKg9c1H2IfrnrrFnOS7YDHnNgQcG4HK5QVU7RKshbkwnyE/YuyHD5f6ToTvP9AWc3cOfRXN1lw2CXQvQPvdT683hgRKA0dMO3Nw9OCcRwsHP8+lNkLpMjfGydzYev38V+agtgUsG3CbOwDtyY9DsxZWDZw5qBoYj1ryX5lbTvmfEt1cNjjfZ/hdBNrTSD/zUDwQqv3FK7rE3twk0Y3xSjr2zdV0c0C7SbgfPcCDBJzn5ISaO4Cav9LCde/qfDi03dzVoa/OLebcxiOMpqE2lZmxZy5vFFBaWKM6oW6GvJh5a3lhPmMxNwteud6ag3W7d4y6RREtkLR/oIQYdSM38sDyWRDtVXRW2Nuas/nqeLo5qE1nMW4RioOKcgL2//G1LzzHeAV7AdTZqY1PN5eb8HAB3xtQI+B8c1C150HlUFH9HTzd3J2L/learTk3NuPqpqK56oWD88bhqOHI1cNa5xqJ6gJY9UBrb8217ou/LOaA5aMXztzoGfY9ddn2VYTj/XjVD+c5I6CuKTdrxnox58C7oJuL459ElzDr5e7C2bvaUeeceMT9AwAA//9hr9WnAAAABklEQVQDAKk6jt5rlhexAAAAAElFTkSuQmCC" alt="QR Code" /></div>
+                            </div>
+                        </div>
+    <script>
+        window.onload = function() { window.print(); };
+    </script>
+</body>
+</html>
