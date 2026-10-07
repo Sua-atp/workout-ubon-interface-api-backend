@@ -888,13 +888,14 @@ async function insertPackageMasterRow(rowData, options = {}) {
     );
 }
 
-async function markPrescriptionGenOrder(an, ordercreatedate, orderitemcode, userId) {
+// ยาตัวเดียวกันอาจมีหลายบรรทัดในใบสั่งเดียว (orderitemcode ซ้ำ) จึง mark ด้วย itemindex ซึ่งไม่ซ้ำต่อบรรทัด
+async function markPrescriptionGenOrder(an, ordercreatedate, itemindex, userId) {
     const filters = [
         '(an = ? OR hn = ?)',
-        'orderitemcode = ?',
+        'itemindex = ?',
         'genorderdatetime IS NULL'
     ];
-    const params = [an, an, orderitemcode || null];
+    const params = [an, an, itemindex || null];
     if (ordercreatedate && String(ordercreatedate).trim() !== '') {
         filters.push('DATE(ordercreatedate) = DATE(?)');
         params.push(String(ordercreatedate).trim());
@@ -910,13 +911,16 @@ async function executeSendByPres(payload) {
     const rawDate = payload.ordercreatedate || payload.date;
     const ordercreatedate = (typeof rawDate === 'string' ? rawDate.trim() : rawDate) || null;
     const userId = payload.userId || payload.userID || null;
-    const orderitemcodes = Array.isArray(payload.orderitemcodes) ? payload.orderitemcodes.filter(Boolean) : [];
+    const itemindexes = Array.isArray(payload.itemindexes)
+        ? [...new Set(payload.itemindexes.map((v) => String(v ?? '').trim()).filter(Boolean))]
+        : [];
 
     const frontendMedications = Array.isArray(payload.medications) ? payload.medications : [];
     const medMap = {};
     for (const med of frontendMedications) {
-        if (med.orderitemcode) {
-            medMap[med.orderitemcode.trim()] = med;
+        const key = String(med.itemindex ?? '').trim();
+        if (key) {
+            medMap[key] = med;
         }
     }
 
@@ -941,9 +945,9 @@ async function executeSendByPres(payload) {
                 params.push(String(ordercreatedate).trim());
             }
 
-            if (orderitemcodes.length > 0) {
-                filters.push(`prescription.orderitemcode IN (${orderitemcodes.map(() => '?').join(', ')})`);
-                params.push(...orderitemcodes);
+            if (itemindexes.length > 0) {
+                filters.push(`prescription.itemindex IN (${itemindexes.map(() => '?').join(', ')})`);
+                params.push(...itemindexes);
             } else {
                 filters.push('prescription.genorderdatetime IS NULL');
             }
@@ -971,20 +975,20 @@ async function executeSendByPres(payload) {
 
             for (let i = 0; i < packageRows.length; i++) {
                 try {
-                    const frontMed = medMap[String(packageRows[i].orderitemcode || '').trim()];
+                    const frontMed = medMap[String(packageRows[i].itemindex ?? '').trim()];
                     const rowData = buildPackageMasterRow(packageRows[i], i, packageRows.length, now, frontMed);
                     await insertPackageMasterRow(rowData, {
                         timetype: packageRows[i].timetype ?? null,
                         separatePrn: isPrnRow(packageRows[i]) && isJvmRow(packageRows[i]),
                         frequencyCounters
                     });
-                    if (packageRows[i].orderitemcode) {
-                        generatedBarcodes[packageRows[i].orderitemcode] = rowData.orderitembarcode;
+                    if (packageRows[i].itemindex) {
+                        generatedBarcodes[packageRows[i].itemindex] = rowData.orderitembarcode;
                     }
                     try {
-                        await markPrescriptionGenOrder(an, ordercreatedate, packageRows[i].orderitemcode, userId);
+                        await markPrescriptionGenOrder(an, ordercreatedate, packageRows[i].itemindex, userId);
                     } catch (markErr) {
-                        console.error(`[send-by-pres] markPrescriptionGenOrder failed for ${an} / ${packageRows[i].orderitemcode}:`, markErr.message);
+                        console.error(`[send-by-pres] markPrescriptionGenOrder failed for ${an} / ${packageRows[i].itemindex}:`, markErr.message);
                         rowWarnings.push(`ยา ${packageRows[i].orderitemcode || `รายการที่ ${i + 1}`}: อัปเดต genorderdatetime ไม่สำเร็จ`);
                     }
                     insertedCount++;
@@ -1068,6 +1072,11 @@ router.post('/api/packagemaster/matching/patients', async (req, res) => {
             filters.push('wardcode = ?');
             params.push(payload.wardcode);
         }
+        const keyFilter = buildPatientKeyFilter(payload.keys, 'matchingdatetime IS NULL AND voiddatetime IS NULL');
+        if (keyFilter) {
+            filters.push(keyFilter.sql);
+            params.push(...keyFilter.params);
+        }
         if (payload.ordercreatedate) {
             filters.push('DATE(ordercreatedate) = ?');
             params.push(payload.ordercreatedate);
@@ -1105,22 +1114,49 @@ router.post('/api/packagemaster/matching/drugs', async (req, res) => {
     }
 });
 
+// ค้นผู้ป่วยข้ามทุกหอผู้ป่วยด้วยค่าที่สแกน (AN / HN / prescriptionno) โดยยังนับ drug_count ของผู้ป่วยทั้งคน
+function buildPatientKeyFilter(keys, baseConditions) {
+    const list = [...new Set((Array.isArray(keys) ? keys : []).map((k) => String(k ?? '').trim()).filter(Boolean))];
+    if (list.length === 0) return null;
+    const ph = list.map(() => '?').join(', ');
+    return {
+        sql: `COALESCE(an, hn) IN (SELECT COALESCE(an, hn) FROM packagemaster WHERE ${baseConditions} AND (an IN (${ph}) OR hn IN (${ph}) OR prescriptionno IN (${ph})))`,
+        params: [...list, ...list, ...list]
+    };
+}
+
+// ระบุซองยาด้วยคู่ (itemindex, orderitembarcode) — orderitemcode ซ้ำได้เมื่อยาตัวเดียวกันมีหลายบรรทัดในใบสั่งเดียว
+function buildPackageItemFilter(items) {
+    const pairs = (Array.isArray(items) ? items : [])
+        .map((it) => ({
+            itemindex: String(it?.itemindex ?? '').trim(),
+            orderitembarcode: String(it?.orderitembarcode ?? '').trim()
+        }))
+        .filter((it) => it.itemindex && it.orderitembarcode);
+    if (pairs.length === 0) return null;
+    return {
+        sql: `(${pairs.map(() => '(itemindex = ? AND orderitembarcode = ?)').join(' OR ')})`,
+        params: pairs.flatMap((it) => [it.itemindex, it.orderitembarcode])
+    };
+}
+
 router.put('/api/packagemaster/confirm-matching', async (req, res) => {
     try {
         await ensureCheckColumnsExist();
         const payload = req.body || {};
-        const { an, orderitemcodes, userId, userName } = payload;
+        const { an, items, userId, userName } = payload;
         if (!an) return res.status(400).json({ success: false, message: 'an is required' });
-        if (!Array.isArray(orderitemcodes) || orderitemcodes.length === 0) {
-            return res.status(400).json({ success: false, message: 'orderitemcodes is required' });
+        const itemFilter = buildPackageItemFilter(items);
+        if (!itemFilter) {
+            return res.status(400).json({ success: false, message: 'items (itemindex + orderitembarcode) is required' });
         }
         const matchingUserId = [userId, userName].filter(Boolean).join('|');
         const filters = [
             '(an = ? OR hn = ?)',
-            `orderitemcode IN (${orderitemcodes.map(() => '?').join(', ')})`,
+            itemFilter.sql,
             'voiddatetime IS NULL'
         ];
-        const params = [matchingUserId, an, an, ...orderitemcodes];
+        const params = [matchingUserId, an, an, ...itemFilter.params];
         const result = await executeMySql(
             `UPDATE packagemaster SET matchingdatetime = NOW(), matchinguserid = ? WHERE ${filters.join(' AND ')}`,
             params
@@ -1169,6 +1205,11 @@ router.post('/api/packagemaster/checkout/patients', async (req, res) => {
             filters.push('wardcode = ?');
             params.push(payload.wardcode);
         }
+        const keyFilter = buildPatientKeyFilter(payload.keys, 'matchingdatetime IS NOT NULL AND checkoutdatetime IS NULL AND voiddatetime IS NULL');
+        if (keyFilter) {
+            filters.push(keyFilter.sql);
+            params.push(...keyFilter.params);
+        }
         if (payload.ordercreatedate) {
             filters.push('DATE(ordercreatedate) = ?');
             params.push(payload.ordercreatedate);
@@ -1210,18 +1251,19 @@ router.put('/api/packagemaster/confirm-checkout', async (req, res) => {
     try {
         await ensureCheckColumnsExist();
         const payload = req.body || {};
-        const { an, orderitemcodes, userId, userName } = payload;
+        const { an, items, userId, userName } = payload;
         if (!an) return res.status(400).json({ success: false, message: 'an is required' });
-        if (!Array.isArray(orderitemcodes) || orderitemcodes.length === 0) {
-            return res.status(400).json({ success: false, message: 'orderitemcodes is required' });
+        const itemFilter = buildPackageItemFilter(items);
+        if (!itemFilter) {
+            return res.status(400).json({ success: false, message: 'items (itemindex + orderitembarcode) is required' });
         }
         const checkoutUserId = [userId, userName].filter(Boolean).join('|');
         const filters = [
             '(an = ? OR hn = ?)',
-            `orderitemcode IN (${orderitemcodes.map(() => '?').join(', ')})`,
+            itemFilter.sql,
             'voiddatetime IS NULL'
         ];
-        const params = [checkoutUserId, an, an, ...orderitemcodes];
+        const params = [checkoutUserId, an, an, ...itemFilter.params];
         const result = await executeMySql(
             `UPDATE packagemaster SET checkoutdatetime = NOW(), checkoutuserid = ? WHERE ${filters.join(' AND ')}`,
             params
@@ -1335,6 +1377,7 @@ router.post('/api/packagemaster/check/drugs', async (req, res) => {
             SELECT
                 prescriptionno,
                 seq,
+                itemindex,
                 orderitemcode,
                 orderitemname,
                 orderitembarcode,
@@ -1390,6 +1433,7 @@ router.post('/api/packagemaster/verify-screen-match', async (req, res) => {
             SELECT
                 prescriptionno,
                 seq,
+                itemindex,
                 orderitemcode,
                 orderitemname,
                 orderitembarcode,
@@ -1459,20 +1503,23 @@ router.put('/api/packagemaster/confirm-check', async (req, res) => {
     try {
         await ensureCheckColumnsExist();
         const payload = req.body || {};
-        const { an, hn, orderitemcodes, userId, userName } = payload;
+        const { an, hn, itemindexes: rawItemindexes, userId, userName } = payload;
         const targetId = an || hn;
         if (!targetId) return res.status(400).json({ success: false, message: 'an or hn is required' });
-        if (!Array.isArray(orderitemcodes) || orderitemcodes.length === 0) {
-            return res.status(400).json({ success: false, message: 'orderitemcodes is required' });
+        const itemindexes = Array.isArray(rawItemindexes)
+            ? [...new Set(rawItemindexes.map((v) => String(v ?? '').trim()).filter(Boolean))]
+            : [];
+        if (itemindexes.length === 0) {
+            return res.status(400).json({ success: false, message: 'itemindexes is required' });
         }
         const checkUserId = [userId, userName].filter(Boolean).join('|');
         const filters = [
             '(an = ? OR hn = ?)',
-            `orderitemcode IN (${orderitemcodes.map(() => '?').join(', ')})`,
+            `itemindex IN (${itemindexes.map(() => '?').join(', ')})`,
             'genorderdatetime IS NULL',
             'voiddatetime IS NULL'
         ];
-        const params = [checkUserId, checkUserId, checkUserId, checkUserId, checkUserId, checkUserId, targetId, targetId, ...orderitemcodes];
+        const params = [checkUserId, checkUserId, checkUserId, checkUserId, checkUserId, checkUserId, targetId, targetId, ...itemindexes];
         const result = await executeMySql(
             `UPDATE prescription SET checkdatetime = NOW(), checkuserid = ?, confirmdatetime = NOW(), confirmuserid = ?, genorderdatetime = NOW(), genorderuserid = ? WHERE ${filters.join(' AND ')}`,
             params
